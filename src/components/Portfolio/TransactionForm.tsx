@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { getAllTickers, isValidTicker, getCEDEARInfo, validateTransaction } from '@/data/cedearsData';
-import { Plus, DollarSign } from 'lucide-react';
+import { useCedearPrices } from '@/hooks/useCedearPrices';
+import { Plus, DollarSign, Zap, Clock } from 'lucide-react';
 
 interface TransactionFormProps {
   onAddTransaction: (transaction: {
@@ -22,6 +24,10 @@ interface TransactionFormProps {
 
 export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: TransactionFormProps) => {
   const { toast } = useToast();
+  const tickers = getAllTickers();
+  const { prices, loading } = useCedearPrices(tickers);
+  const [isPriceAutoFilled, setIsPriceAutoFilled] = useState(false);
+  
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
     tipo: 'compra' as 'compra' | 'venta',
@@ -38,6 +44,19 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
   });
 
   const [showPriceUpdate, setShowPriceUpdate] = useState(false);
+
+  // Auto-fill price when ticker changes
+  useEffect(() => {
+    if (formData.ticker && Object.keys(prices).length > 0) {
+      const priceData = prices[formData.ticker];
+      if (priceData && priceData.px_mid) {
+        setFormData(prev => ({ ...prev, precio_ars: priceData.px_mid.toString() }));
+        setIsPriceAutoFilled(true);
+      }
+    } else {
+      setIsPriceAutoFilled(false);
+    }
+  }, [formData.ticker, prices]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +108,7 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
       cantidad: '',
       usd_rate_historico: '1000'
     });
+    setIsPriceAutoFilled(false);
   };
 
   const handlePriceUpdate = (e: React.FormEvent) => {
@@ -121,7 +141,9 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
     });
   };
 
-  const tickers = getAllTickers();
+  const getCurrentPrice = (ticker: string) => {
+    return prices[ticker];
+  };
 
   return (
     <div className="space-y-6">
@@ -180,16 +202,36 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
               </div>
 
               <div>
-                <Label htmlFor="precio">Precio (ARS)</Label>
+                <Label htmlFor="precio" className="flex items-center gap-2">
+                  Precio (ARS)
+                  {isPriceAutoFilled && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Zap className="w-3 h-3 mr-1" />
+                      Auto-completado
+                    </Badge>
+                  )}
+                </Label>
                 <Input
                   id="precio"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
                   value={formData.precio_ars}
-                  onChange={(e) => setFormData({ ...formData, precio_ars: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, precio_ars: e.target.value });
+                    setIsPriceAutoFilled(false);
+                  }}
+                  className={isPriceAutoFilled ? "border-primary" : ""}
                   required
                 />
+                {formData.ticker && getCurrentPrice(formData.ticker) && (
+                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    <span>
+                      Último precio: {new Date(getCurrentPrice(formData.ticker)?.last_updated || '').toLocaleString('es-AR')}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div>
