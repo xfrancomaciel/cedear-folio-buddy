@@ -3,6 +3,7 @@ import { Transaction, CurrentPrice, PortfolioSummary } from '@/types/portfolio';
 import { calculatePortfolioSummary, enhanceTransaction } from '@/utils/portfolioCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCedearPrices } from './useCedearPrices';
 
 const STORAGE_KEYS = {
   TRANSACTIONS: 'cedear-transactions',
@@ -15,6 +16,16 @@ export const usePortfolioData = () => {
   const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  // Get unique tickers from transactions for real-time price updates
+  const tickers = [...new Set(transactions.map(tx => tx.ticker))];
+  const { 
+    prices: cedearPrices, 
+    loading: pricesLoading, 
+    error: pricesError,
+    lastUpdated: pricesLastUpdated,
+    refresh: refreshPrices
+  } = useCedearPrices(tickers);
 
   // Migrate localStorage data to Supabase
   const migrateLocalStorageData = async () => {
@@ -162,12 +173,24 @@ export const usePortfolioData = () => {
   // Recalculate portfolio summary when data changes
   useEffect(() => {
     if (transactions.length > 0) {
-      const summary = calculatePortfolioSummary(transactions, currentPrices);
+      // Merge CEDEAR prices with current prices format
+      const mergedPrices = { ...currentPrices };
+      
+      Object.entries(cedearPrices).forEach(([ticker, price]) => {
+        mergedPrices[ticker] = {
+          ticker,
+          precio_ars: price.px_close,
+          usd_rate: 1000, // Default rate for now
+          updated_at: price.last_updated
+        };
+      });
+
+      const summary = calculatePortfolioSummary(transactions, mergedPrices);
       setPortfolioSummary(summary);
     } else {
       setPortfolioSummary(null);
     }
-  }, [transactions, currentPrices]);
+  }, [transactions, currentPrices, cedearPrices]);
 
   const addTransaction = async (transaction: {
     fecha: string;
@@ -348,6 +371,12 @@ export const usePortfolioData = () => {
     addTransaction,
     updateCurrentPrice,
     deleteTransaction,
-    clearAllData
+    clearAllData,
+    // CEDEAR prices data
+    cedearPrices,
+    pricesLoading,
+    pricesError,
+    pricesLastUpdated,
+    refreshPrices
   };
 };

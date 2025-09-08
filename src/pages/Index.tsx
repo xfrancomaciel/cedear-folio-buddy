@@ -5,6 +5,7 @@ import { PositionsTable } from '@/components/Portfolio/PositionsTable';
 import { TransactionForm } from '@/components/Portfolio/TransactionForm';
 import { TransactionHistory } from '@/components/Portfolio/TransactionHistory';
 import { RealizedGainsTable } from '@/components/Portfolio/RealizedGainsTable';
+import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +20,11 @@ const Index = () => {
     addTransaction,
     updateCurrentPrice,
     deleteTransaction,
-    clearAllData
+    clearAllData,
+    pricesLoading,
+    pricesError,
+    pricesLastUpdated,
+    refreshPrices
   } = usePortfolioData();
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -63,6 +68,16 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Price Update Status */}
+        <div className="mb-6">
+          <PriceUpdateStatus
+            loading={pricesLoading}
+            error={pricesError}
+            lastUpdated={pricesLastUpdated}
+            onRefresh={refreshPrices}
+          />
+        </div>
+
         {/* Portfolio Summary */}
         {portfolioSummary && (
           <div className="mb-8 animate-fade-in">
