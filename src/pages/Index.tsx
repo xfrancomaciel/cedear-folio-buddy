@@ -10,9 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp } from 'lucide-react';
+import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
+  const navigate = useNavigate();
   const {
     transactions,
     currentPrices,
@@ -54,6 +56,15 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/precios')}
+                className="flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Ver Precios CEDEAR
+              </Button>
               <Badge variant="outline" className="text-xs">
                 MVP v1.0
               </Badge>
