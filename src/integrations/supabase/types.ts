@@ -52,6 +52,27 @@ export type Database = {
           },
         ]
       }
+      current_prices: {
+        Row: {
+          precio_ars: number
+          ticker: string
+          updated_at: string
+          usd_rate: number
+        }
+        Insert: {
+          precio_ars: number
+          ticker: string
+          updated_at?: string
+          usd_rate: number
+        }
+        Update: {
+          precio_ars?: number
+          ticker?: string
+          updated_at?: string
+          usd_rate?: number
+        }
+        Relationships: []
+      }
       game_results: {
         Row: {
           alias: string | null
@@ -230,6 +251,60 @@ export type Database = {
           symbol?: string
           timestamp?: string
           volume?: number | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          cantidad: number
+          cantidad_acciones_reales: number
+          created_at: string
+          dias_tenencia: number | null
+          fecha: string
+          id: string
+          precio_accion_usd: number
+          precio_ars: number
+          ticker: string
+          tipo: string
+          total_ars: number
+          total_usd: number
+          updated_at: string
+          usd_por_cedear: number
+          usd_rate_historico: number
+        }
+        Insert: {
+          cantidad: number
+          cantidad_acciones_reales: number
+          created_at?: string
+          dias_tenencia?: number | null
+          fecha: string
+          id?: string
+          precio_accion_usd: number
+          precio_ars: number
+          ticker: string
+          tipo: string
+          total_ars: number
+          total_usd: number
+          updated_at?: string
+          usd_por_cedear: number
+          usd_rate_historico: number
+        }
+        Update: {
+          cantidad?: number
+          cantidad_acciones_reales?: number
+          created_at?: string
+          dias_tenencia?: number | null
+          fecha?: string
+          id?: string
+          precio_accion_usd?: number
+          precio_ars?: number
+          ticker?: string
+          tipo?: string
+          total_ars?: number
+          total_usd?: number
+          updated_at?: string
+          usd_por_cedear?: number
+          usd_rate_historico?: number
         }
         Relationships: []
       }
