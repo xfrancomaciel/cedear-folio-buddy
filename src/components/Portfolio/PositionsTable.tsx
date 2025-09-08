@@ -43,9 +43,10 @@ export const PositionsTable = ({ positions }: PositionsTableProps) => {
               <tr className="border-b border-border/50">
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">TICKER</th>
                 <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">CANTIDAD</th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">DÍAS</th>
                 <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">PRECIO PROM.</th>
                 <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">VALOR ACTUAL</th>
-                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">GANANCIA</th>
+                <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">GANANCIA / VAR.</th>
                 <th className="text-right py-3 px-2 text-sm font-medium text-muted-foreground">% CARTERA</th>
               </tr>
             </thead>
@@ -74,11 +75,15 @@ export const PositionsTable = ({ positions }: PositionsTableProps) => {
                     <td className="text-right py-4 px-2">
                       <div className="flex flex-col">
                         <span className="font-semibold">{position.cantidad.toLocaleString()}</span>
-                        {cedearsInfo && (
-                          <span className="text-xs text-muted-foreground">
-                            {(position.cantidad / cedearsInfo.ratio).toFixed(2)} acc.
-                          </span>
-                        )}
+                        <span className="text-xs text-muted-foreground">
+                          {position.cantidad_acciones_reales.toFixed(4)} acc.
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-right py-4 px-2">
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{position.dias_tenencia_promedio}</span>
+                        <span className="text-xs text-muted-foreground">días</span>
                       </div>
                     </td>
                     <td className="text-right py-4 px-2">
@@ -106,9 +111,14 @@ export const PositionsTable = ({ positions }: PositionsTableProps) => {
                         <span className={`font-semibold ${position.ganancia_no_realizada_ars >= 0 ? 'gain-positive' : 'gain-negative'}`}>
                           {formatCurrency(position.ganancia_no_realizada_ars, 'ARS')}
                         </span>
-                        <span className={`text-xs ${gainPercentage >= 0 ? 'gain-positive' : 'gain-negative'}`}>
-                          {formatPercentage(gainPercentage)}
-                        </span>
+                        <div className="flex gap-2 text-xs">
+                          <span className={`${position.variacion_ars >= 0 ? 'gain-positive' : 'gain-negative'}`}>
+                            ARS: {formatPercentage(position.variacion_ars)}
+                          </span>
+                          <span className={`${position.variacion_usd >= 0 ? 'gain-positive' : 'gain-negative'}`}>
+                            USD: {formatPercentage(position.variacion_usd)}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td className="text-right py-4 px-2">

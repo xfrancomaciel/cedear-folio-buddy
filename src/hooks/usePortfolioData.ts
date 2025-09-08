@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Transaction, CurrentPrice, PortfolioSummary } from '@/types/portfolio';
-import { calculatePortfolioSummary } from '@/utils/portfolioCalculations';
+import { calculatePortfolioSummary, enhanceTransaction } from '@/utils/portfolioCalculations';
 
 const STORAGE_KEYS = {
   TRANSACTIONS: 'cedear-transactions',
@@ -44,13 +44,27 @@ export const usePortfolioData = () => {
     }
   }, [transactions, currentPrices]);
 
-  const addTransaction = (transaction: Omit<Transaction, 'id' | 'created_at'>) => {
-    const newTransaction: Transaction = {
+  const addTransaction = (transaction: {
+    fecha: string;
+    tipo: 'compra' | 'venta';
+    ticker: string;
+    precio_ars: number;
+    cantidad: number;
+    usd_rate_historico: number;
+  }) => {
+    const total_ars = transaction.precio_ars * transaction.cantidad;
+    const total_usd = total_ars / transaction.usd_rate_historico;
+    
+    const enhancedTransaction = enhanceTransaction({
       ...transaction,
+      total_ars,
+      total_usd
+    });
+
+    const newTransaction: Transaction = {
+      ...enhancedTransaction,
       id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-      total_ars: transaction.precio_ars * transaction.cantidad,
-      total_usd: (transaction.precio_ars * transaction.cantidad) / transaction.usd_rate_historico
+      created_at: new Date().toISOString()
     };
 
     const updatedTransactions = [...transactions, newTransaction];

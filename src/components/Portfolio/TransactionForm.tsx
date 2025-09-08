@@ -5,12 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Transaction } from '@/types/portfolio';
-import { getAllTickers, isValidTicker, getCEDEARInfo } from '@/data/cedearsData';
+import { getAllTickers, isValidTicker, getCEDEARInfo, validateTransaction } from '@/data/cedearsData';
 import { Plus, DollarSign } from 'lucide-react';
 
 interface TransactionFormProps {
-  onAddTransaction: (transaction: Omit<Transaction, 'id' | 'created_at'>) => void;
+  onAddTransaction: (transaction: {
+    fecha: string;
+    tipo: 'compra' | 'venta';
+    ticker: string;
+    precio_ars: number;
+    cantidad: number;
+    usd_rate_historico: number;
+  }) => void;
   onUpdatePrice: (ticker: string, precio_ars: number, usd_rate: number) => void;
 }
 
@@ -36,11 +42,24 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isValidTicker(formData.ticker)) {
-      toast({
-        title: "Error",
-        description: "Ticker CEDEAR no válido. Selecciona uno de la lista.",
-        variant: "destructive"
+    const transactionData = {
+      fecha: formData.fecha,
+      tipo: formData.tipo,
+      ticker: formData.ticker.toUpperCase(),
+      precio_ars: parseFloat(formData.precio_ars),
+      cantidad: parseInt(formData.cantidad),
+      usd_rate_historico: parseFloat(formData.usd_rate_historico)
+    };
+
+    const validationErrors = validateTransaction(transactionData);
+    
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(error => {
+        toast({
+          title: "Error de validación",
+          description: error,
+          variant: "destructive"
+        });
       });
       return;
     }
@@ -51,9 +70,7 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
       ticker: formData.ticker.toUpperCase(),
       precio_ars: parseFloat(formData.precio_ars),
       cantidad: parseInt(formData.cantidad),
-      usd_rate_historico: parseFloat(formData.usd_rate_historico),
-      total_ars: parseFloat(formData.precio_ars) * parseInt(formData.cantidad),
-      total_usd: (parseFloat(formData.precio_ars) * parseInt(formData.cantidad)) / parseFloat(formData.usd_rate_historico)
+      usd_rate_historico: parseFloat(formData.usd_rate_historico)
     };
 
     onAddTransaction(transaction);

@@ -4,11 +4,12 @@ import { PortfolioSummaryCard } from '@/components/Portfolio/PortfolioSummary';
 import { PositionsTable } from '@/components/Portfolio/PositionsTable';
 import { TransactionForm } from '@/components/Portfolio/TransactionForm';
 import { TransactionHistory } from '@/components/Portfolio/TransactionHistory';
+import { RealizedGainsTable } from '@/components/Portfolio/RealizedGainsTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { PieChart, Plus, History, Settings, AlertTriangle } from 'lucide-react';
+import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp } from 'lucide-react';
 
 const Index = () => {
   const {
@@ -71,7 +72,7 @@ const Index = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="portfolio" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-card/50">
+          <TabsList className="grid w-full grid-cols-5 bg-card/50">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <PieChart className="h-4 w-4" />
               Portfolio
@@ -80,13 +81,17 @@ const Index = () => {
               <Plus className="h-4 w-4" />
               Agregar
             </TabsTrigger>
+            <TabsTrigger value="gains" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Ganancias
+            </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
               Historial
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              Configuración
+              Config
             </TabsTrigger>
           </TabsList>
 
@@ -115,6 +120,22 @@ const Index = () => {
               onAddTransaction={addTransaction}
               onUpdatePrice={updateCurrentPrice}
             />
+          </TabsContent>
+
+          <TabsContent value="gains" className="animate-slide-up">
+            {portfolioSummary && portfolioSummary.operaciones_cerradas.length > 0 ? (
+              <RealizedGainsTable operacionesCerradas={portfolioSummary.operaciones_cerradas} />
+            ) : (
+              <Card className="card-financial">
+                <CardContent className="text-center py-12">
+                  <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">Sin Ganancias Realizadas</h3>
+                  <p className="text-muted-foreground">
+                    Realiza operaciones de venta para ver tus ganancias aquí
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="history" className="animate-slide-up">
