@@ -52,6 +52,45 @@ export type Database = {
           },
         ]
       }
+      cedear_prices: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_updated: string | null
+          pct_change: number | null
+          px_ask: number | null
+          px_bid: number | null
+          px_close: number | null
+          px_mid: number | null
+          symbol: string
+          volume: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          pct_change?: number | null
+          px_ask?: number | null
+          px_bid?: number | null
+          px_close?: number | null
+          px_mid?: number | null
+          symbol: string
+          volume?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          pct_change?: number | null
+          px_ask?: number | null
+          px_bid?: number | null
+          px_close?: number | null
+          px_mid?: number | null
+          symbol?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       current_prices: {
         Row: {
           precio_ars: number
@@ -337,7 +376,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      latest_cedear_prices: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          last_updated: string | null
+          pct_change: number | null
+          px_ask: number | null
+          px_bid: number | null
+          px_close: number | null
+          px_mid: number | null
+          symbol: string | null
+          volume: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
