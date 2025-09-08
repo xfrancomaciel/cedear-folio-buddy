@@ -1,12 +1,198 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
+import { PortfolioSummaryCard } from '@/components/Portfolio/PortfolioSummary';
+import { PositionsTable } from '@/components/Portfolio/PositionsTable';
+import { TransactionForm } from '@/components/Portfolio/TransactionForm';
+import { TransactionHistory } from '@/components/Portfolio/TransactionHistory';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { PieChart, Plus, History, Settings, AlertTriangle } from 'lucide-react';
 
 const Index = () => {
+  const {
+    transactions,
+    currentPrices,
+    portfolioSummary,
+    addTransaction,
+    updateCurrentPrice,
+    deleteTransaction,
+    clearAllData
+  } = usePortfolioData();
+
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const handleClearData = () => {
+    if (showClearConfirm) {
+      clearAllData();
+      setShowClearConfirm(false);
+    } else {
+      setShowClearConfirm(true);
+      setTimeout(() => setShowClearConfirm(false), 3000);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gradient">
+                CEDEAR Portfolio Tracker
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Gestiona tu cartera de CEDEARs con precisión profesional
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline" className="text-xs">
+                MVP v1.0
+              </Badge>
+              {portfolioSummary && (
+                <Badge className="gradient-primary text-xs">
+                  {portfolioSummary.posiciones.length} posiciones activas
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        {/* Portfolio Summary */}
+        {portfolioSummary && (
+          <div className="mb-8 animate-fade-in">
+            <PortfolioSummaryCard summary={portfolioSummary} />
+          </div>
+        )}
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="portfolio" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-card/50">
+            <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <PieChart className="h-4 w-4" />
+              Portfolio
+            </TabsTrigger>
+            <TabsTrigger value="add" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Agregar
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Historial
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Configuración
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="portfolio" className="space-y-6 animate-slide-up">
+            {portfolioSummary ? (
+              <PositionsTable positions={portfolioSummary.posiciones} />
+            ) : (
+              <Card className="card-financial">
+                <CardContent className="text-center py-12">
+                  <PieChart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">Portfolio Vacío</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Comienza agregando tu primera transacción para ver tu portfolio
+                  </p>
+                  <Button className="gradient-primary">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Agregar Primera Transacción
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="add" className="animate-slide-up">
+            <TransactionForm
+              onAddTransaction={addTransaction}
+              onUpdatePrice={updateCurrentPrice}
+            />
+          </TabsContent>
+
+          <TabsContent value="history" className="animate-slide-up">
+            <TransactionHistory
+              transactions={transactions}
+              onDeleteTransaction={deleteTransaction}
+            />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6 animate-slide-up">
+            <Card className="card-financial">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Configuración
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Datos del Portfolio</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Toda la información se almacena localmente en tu navegador.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="p-3 bg-muted/20 rounded-lg">
+                      <div className="font-semibold">Transacciones</div>
+                      <div className="text-muted-foreground">{transactions.length}</div>
+                    </div>
+                    <div className="p-3 bg-muted/20 rounded-lg">
+                      <div className="font-semibold">Precios Actualizados</div>
+                      <div className="text-muted-foreground">{Object.keys(currentPrices).length}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-border/50 pt-6">
+                  <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-warning" />
+                    Zona de Peligro
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Esta acción eliminará permanentemente todos tus datos.
+                  </p>
+                  <Button
+                    variant={showClearConfirm ? "destructive" : "outline"}
+                    onClick={handleClearData}
+                    className="w-full"
+                  >
+                    {showClearConfirm ? "¿Confirmar eliminación?" : "Limpiar Todos los Datos"}
+                  </Button>
+                  {showClearConfirm && (
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Haz clic nuevamente para confirmar (se cancela automáticamente en 3s)
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Disclaimer */}
+            <Card className="card-financial border-warning/50">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <h4 className="font-semibold mb-2">Disclaimer Financiero</h4>
+                    <p className="text-muted-foreground">
+                      Esta herramienta es solo para fines informativos y de tracking personal. 
+                      No constituye asesoramiento financiero. Los precios y cálculos pueden no estar actualizados 
+                      o ser inexactos. Siempre consulta fuentes oficiales y profesionales para decisiones de inversión.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
