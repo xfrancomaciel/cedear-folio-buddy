@@ -36,6 +36,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DollarRates } from "@/components/DollarRates";
 import { toast } from "sonner";
 
 const navigationItems = [
@@ -298,6 +299,7 @@ export function InvestorDashboard() {
       </SidebarContent>
       
       <SidebarFooter>
+        <DollarRates />
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
