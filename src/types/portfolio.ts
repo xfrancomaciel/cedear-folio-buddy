@@ -1,3 +1,13 @@
+export type TransactionCategory = 
+  | 'Jubilación'
+  | 'Viaje' 
+  | 'Ahorro'
+  | 'Emergencias'
+  | 'Educación'
+  | 'Inversión'
+  | 'Casa'
+  | 'Auto';
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -12,6 +22,7 @@ export interface Transaction {
   usd_por_cedear: number;
   cantidad_acciones_reales: number;
   precio_accion_usd: number;
+  categoria?: TransactionCategory;
   dias_tenencia?: number;
   created_at: string;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Transaction, CurrentPrice, PortfolioSummary } from '@/types/portfolio';
+import { Transaction, CurrentPrice, PortfolioSummary, TransactionCategory } from '@/types/portfolio';
 import { calculatePortfolioSummary, enhanceTransaction } from '@/utils/portfolioCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -210,6 +210,7 @@ export const usePortfolioData = () => {
     precio_ars: number;
     cantidad: number;
     usd_rate_historico: number;
+    categoria?: TransactionCategory;
   }) => {
     if (!user?.id) {
       toast({
@@ -244,7 +245,8 @@ export const usePortfolioData = () => {
         usd_por_cedear: enhancedTransaction.usd_por_cedear,
         cantidad_acciones_reales: enhancedTransaction.cantidad_acciones_reales,
         precio_accion_usd: enhancedTransaction.precio_accion_usd,
-        dias_tenencia: enhancedTransaction.dias_tenencia
+        dias_tenencia: enhancedTransaction.dias_tenencia,
+        categoria: transaction.categoria || 'Inversión'
       }).select().single();
 
       if (error) {

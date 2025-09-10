@@ -375,6 +375,7 @@ export type Database = {
         Row: {
           cantidad: number
           cantidad_acciones_reales: number
+          categoria: Database["public"]["Enums"]["transaction_category"] | null
           created_at: string
           dias_tenencia: number | null
           fecha: string
@@ -393,6 +394,7 @@ export type Database = {
         Insert: {
           cantidad: number
           cantidad_acciones_reales: number
+          categoria?: Database["public"]["Enums"]["transaction_category"] | null
           created_at?: string
           dias_tenencia?: number | null
           fecha: string
@@ -411,6 +413,7 @@ export type Database = {
         Update: {
           cantidad?: number
           cantidad_acciones_reales?: number
+          categoria?: Database["public"]["Enums"]["transaction_category"] | null
           created_at?: string
           dias_tenencia?: number | null
           fecha?: string
@@ -535,6 +538,15 @@ export type Database = {
         | "C"
         | "D"
         | "NR"
+      transaction_category:
+        | "Jubilación"
+        | "Viaje"
+        | "Ahorro"
+        | "Emergencias"
+        | "Educación"
+        | "Inversión"
+        | "Casa"
+        | "Auto"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -702,6 +714,16 @@ export const Constants = {
         "C",
         "D",
         "NR",
+      ],
+      transaction_category: [
+        "Jubilación",
+        "Viaje",
+        "Ahorro",
+        "Emergencias",
+        "Educación",
+        "Inversión",
+        "Casa",
+        "Auto",
       ],
     },
   },

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { getAllTickers, isValidTicker, getCEDEARInfo, validateTransaction } from '@/data/cedearsData';
 import { useCedearPrices } from '@/hooks/useCedearPrices';
+import { TransactionCategory } from '@/types/portfolio';
 import { Plus, DollarSign, Zap, Clock } from 'lucide-react';
 
 interface TransactionFormProps {
@@ -18,6 +19,7 @@ interface TransactionFormProps {
     precio_ars: number;
     cantidad: number;
     usd_rate_historico: number;
+    categoria?: TransactionCategory;
   }) => void;
   onUpdatePrice: (ticker: string, precio_ars: number, usd_rate: number) => void;
 }
@@ -34,7 +36,8 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
     ticker: '',
     precio_ars: '',
     cantidad: '',
-    usd_rate_historico: '1000'
+    usd_rate_historico: '1000',
+    categoria: 'Inversión' as TransactionCategory
   });
 
   const [priceUpdateData, setPriceUpdateData] = useState({
@@ -89,7 +92,8 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
       ticker: formData.ticker.toUpperCase(),
       precio_ars: parseFloat(formData.precio_ars),
       cantidad: parseInt(formData.cantidad),
-      usd_rate_historico: parseFloat(formData.usd_rate_historico)
+      usd_rate_historico: parseFloat(formData.usd_rate_historico),
+      categoria: formData.categoria
     };
 
     onAddTransaction(transaction);
@@ -106,7 +110,8 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
       ticker: '',
       precio_ars: '',
       cantidad: '',
-      usd_rate_historico: '1000'
+      usd_rate_historico: '1000',
+      categoria: 'Inversión'
     });
     setIsPriceAutoFilled(false);
   };
@@ -244,6 +249,28 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
                   onChange={(e) => setFormData({ ...formData, cantidad: e.target.value })}
                   required
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="categoria">Categoría</Label>
+                <Select 
+                  value={formData.categoria} 
+                  onValueChange={(value: TransactionCategory) => setFormData({ ...formData, categoria: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Inversión">Inversión</SelectItem>
+                    <SelectItem value="Jubilación">Jubilación</SelectItem>
+                    <SelectItem value="Viaje">Viaje</SelectItem>
+                    <SelectItem value="Ahorro">Ahorro</SelectItem>
+                    <SelectItem value="Emergencias">Emergencias</SelectItem>
+                    <SelectItem value="Educación">Educación</SelectItem>
+                    <SelectItem value="Casa">Casa</SelectItem>
+                    <SelectItem value="Auto">Auto</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

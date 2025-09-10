@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { PortfolioSummaryCard } from '@/components/Portfolio/PortfolioSummary';
 import { PositionsTable } from '@/components/Portfolio/PositionsTable';
@@ -11,10 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     transactions,
     currentPrices,
@@ -30,6 +31,21 @@ const Index = () => {
   } = usePortfolioData();
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // Handle hash-based navigation
+  const getActiveTab = () => {
+    const hash = location.hash.slice(1); // Remove the # from hash
+    if (['add', 'gains', 'history', 'settings'].includes(hash)) {
+      return hash;
+    }
+    return 'portfolio';
+  };
+
+  const [activeTab, setActiveTab] = useState(getActiveTab());
+
+  useEffect(() => {
+    setActiveTab(getActiveTab());
+  }, [location.hash]);
 
   const handleClearData = () => {
     if (showClearConfirm) {
@@ -62,7 +78,7 @@ const Index = () => {
         )}
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="portfolio" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-card/50">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <PieChart className="h-4 w-4" />
@@ -86,9 +102,13 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="portfolio" className="space-y-6 animate-slide-up">
+            <TabsContent value="portfolio" className="space-y-6 animate-slide-up">
             {portfolioSummary ? (
-              <PositionsTable positions={portfolioSummary.posiciones} />
+              <PositionsTable 
+                positions={portfolioSummary.posiciones}
+                onSellTransaction={addTransaction}
+                currentPrices={currentPrices}
+              />
             ) : (
               <Card className="card-financial">
                 <CardContent className="text-center py-12">

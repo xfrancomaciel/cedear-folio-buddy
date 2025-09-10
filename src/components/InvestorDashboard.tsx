@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   Sidebar,
   SidebarContent,
@@ -11,7 +11,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   LayoutDashboard, 
   TrendingUp, 
@@ -20,7 +24,10 @@ import {
   BarChart3, 
   Settings, 
   LogOut,
-  User
+  User,
+  Plus,
+  History,
+  ChevronRight
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,17 +52,42 @@ const navigationItems = [
     icon: DollarSign,
     tooltip: "Precios CEDEAR",
   },
+];
+
+const portfolioItems = [
   {
-    title: "Portfolio",
+    title: "Ver Portfolio",
     url: "/portfolio",
-    icon: PieChart,
-    tooltip: "Gestión de portfolio",
+    tooltip: "Vista completa del portfolio",
+  },
+  {
+    title: "Agregar",
+    url: "/portfolio#add",
+    tooltip: "Agregar transacciones",
+  },
+  {
+    title: "Ganancias",
+    url: "/portfolio#gains",
+    tooltip: "Ganancias realizadas",
+  },
+  {
+    title: "Historial",
+    url: "/portfolio#history",
+    tooltip: "Historial de transacciones",
+  },
+  {
+    title: "Configuración",
+    url: "/portfolio#settings",
+    tooltip: "Configuración del portfolio",
   },
 ];
 
 export function InvestorDashboard() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const [isPortfolioOpen, setIsPortfolioOpen] = useState(
+    location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
+  );
   
   const handleSignOut = async () => {
     await signOut();
@@ -121,6 +153,38 @@ export function InvestorDashboard() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {/* Portfolio Collapsible Section */}
+              <Collapsible open={isPortfolioOpen} onOpenChange={setIsPortfolioOpen}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton 
+                      tooltip="Gestión de portfolio"
+                      isActive={location.pathname.startsWith('/portfolio')}
+                    >
+                      <PieChart />
+                      <span>Portfolio</span>
+                      <ChevronRight className="ml-auto transition-transform data-[state=open]:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {portfolioItems.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton 
+                            asChild
+                            isActive={location.pathname === item.url || (item.url.includes('#') && location.pathname === '/portfolio')}
+                          >
+                            <Link to={item.url}>
+                              <span>{item.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
