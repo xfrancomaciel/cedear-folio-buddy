@@ -27,11 +27,62 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            } />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><Dashboard /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/bonos" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><BondsAnalytics /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/acciones" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><CedearPrices /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/portfolio" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><Index /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/configuracion" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><Settings /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><Dashboard /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="*" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><NotFound /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
@@ -39,7 +90,7 @@ const App = () => (
   </QueryClientProvider>
 );
 
-const AppLayout = () => (
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <SidebarProvider>
     <div className="flex min-h-screen w-full">
       <InvestorDashboard />
@@ -52,15 +103,7 @@ const AppLayout = () => (
           </div>
         </header>
         <div className="flex-1 overflow-auto">
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/bonos" element={<BondsAnalytics />} />
-            <Route path="/acciones" element={<CedearPrices />} />
-            <Route path="/portfolio" element={<Index />} />
-            <Route path="/configuracion" element={<Settings />} />
-            <Route path="/" element={<Dashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          {children}
         </div>
       </main>
     </div>
