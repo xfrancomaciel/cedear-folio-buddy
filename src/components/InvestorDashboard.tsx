@@ -31,7 +31,8 @@ import {
   GraduationCap,
   FileText,
   Users,
-  Wrench
+  Wrench,
+  PlayCircle
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -76,6 +77,12 @@ const navigationItems = [
     icon: Users,
     tooltip: "Comunidad de inversores",
     external: true,
+  },
+  {
+    title: "YouTube",
+    url: "/youtube",
+    icon: PlayCircle,
+    tooltip: "Canal de YouTube oficial",
   },
 ];
 

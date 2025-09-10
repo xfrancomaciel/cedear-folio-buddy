@@ -22,6 +22,7 @@ import Graficador from "./pages/Graficador";
 import Mapa from "./pages/Mapa";
 import Screener from "./pages/Screener";
 import Analizador from "./pages/Analizador";
+import YouTube from "./pages/YouTube";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -92,6 +93,16 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <Formaciones />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/youtube"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <YouTube />
                 </AppLayout>
               </ProtectedRoute>
             }
