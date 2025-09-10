@@ -16,13 +16,6 @@ import {
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { 
-  LayoutDashboard, 
-  TrendingUp, 
-  DollarSign, 
-  PieChart, 
-  BarChart3, 
-  Settings, 
 import {
   LayoutDashboard,
   TrendingUp,
@@ -47,8 +40,8 @@ import {
   User,
   Wrench,
   PlayCircle,
-  ExternalLink
-} from "lucide-react";
+  ExternalLink,
+  PieChart
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
