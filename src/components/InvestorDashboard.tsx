@@ -117,6 +117,11 @@ const herramientasItems = [
     url: "/herramientas/mapa",
     tooltip: "Mapa de calor de acciones",
   },
+  {
+    title: "Screener",
+    url: "/herramientas/screener",
+    tooltip: "Screener de acciones",
+  },
 ];
 
 export function InvestorDashboard() {

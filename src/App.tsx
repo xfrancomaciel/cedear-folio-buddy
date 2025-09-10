@@ -20,6 +20,7 @@ import Reports from "./pages/Reports";
 import Formaciones from "./pages/Formaciones";
 import Graficador from "./pages/Graficador";
 import Mapa from "./pages/Mapa";
+import Screener from "./pages/Screener";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -114,7 +115,17 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-            <Route 
+          <Route
+            path="/herramientas/screener"
+            element={
+              <ProtectedRoute>
+                <ScreenerLayout>
+                  <Screener />
+                </ScreenerLayout>
+              </ProtectedRoute>
+            }
+          />
+            <Route
               path="/" 
               element={
                 <ProtectedRoute>
@@ -198,6 +209,29 @@ const MapaLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
             <span className="font-semibold text-foreground">Mapa de Calor</span>
+          </div>
+        </header>
+        <div className="h-[calc(100vh-7rem)] w-full">
+          {children}
+        </div>
+      </main>
+    </div>
+  </SidebarProvider>
+);
+
+const ScreenerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <SidebarProvider>
+    <div className="flex min-h-screen w-full">
+      <InvestorDashboard />
+      <main className="flex-1 h-screen flex flex-col">
+        <div className="sticky top-0 z-50 bg-background border-b">
+          <TradingViewTickerTape />
+        </div>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <div className="flex items-center gap-2">
+            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
+            <span className="font-semibold text-foreground">Screener de Acciones</span>
           </div>
         </header>
         <div className="h-[calc(100vh-7rem)] w-full">
