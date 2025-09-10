@@ -27,6 +27,10 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
+  
+  // Error states
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -51,10 +55,42 @@ export default function Auth() {
     }
   };
 
+  // Email validation function
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(email);
+    
+    if (!isValid && email) {
+      setEmailError('Usa un correo válido como ejemplo@gmail.com');
+      return false;
+    } else if (email.includes('test.com') || email.includes('example.com')) {
+      setEmailError('Usa un correo real, no de prueba (ej: tu_nombre@gmail.com)');
+      return false;
+    } else {
+      setEmailError('');
+      return true;
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Reset errors
+    setEmailError('');
+    setPasswordError('');
+    
+    // Validate email
+    if (!validateEmail(signupEmail)) {
+      return;
+    }
+    
     if (signupPassword !== confirmPassword) {
+      setPasswordError('Las contraseñas no coinciden');
+      return;
+    }
+    
+    if (signupPassword.length < 6) {
+      setPasswordError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
 
@@ -84,6 +120,8 @@ export default function Auth() {
     setConfirmPassword('');
     setUsername('');
     setFullName('');
+    setEmailError('');
+    setPasswordError('');
   };
 
   if (authLoading) {
@@ -172,12 +210,20 @@ export default function Auth() {
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="tu@email.com"
+                      placeholder="tu_nombre@gmail.com"
                       value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
+                      onChange={(e) => {
+                        setSignupEmail(e.target.value);
+                        if (emailError) validateEmail(e.target.value);
+                      }}
+                      onBlur={(e) => validateEmail(e.target.value)}
                       required
                       disabled={isLoading}
+                      className={emailError ? 'border-red-500' : ''}
                     />
+                    {emailError && (
+                      <p className="text-sm text-red-600">{emailError}</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -213,11 +259,18 @@ export default function Auth() {
                       type="password"
                       placeholder="••••••••"
                       value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
+                      onChange={(e) => {
+                        setSignupPassword(e.target.value);
+                        if (passwordError) setPasswordError('');
+                      }}
                       required
                       disabled={isLoading}
                       minLength={6}
+                      className={passwordError ? 'border-red-500' : ''}
                     />
+                    {passwordError && (
+                      <p className="text-sm text-red-600">{passwordError}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -235,6 +288,9 @@ export default function Auth() {
                     {confirmPassword && signupPassword !== confirmPassword && (
                       <p className="text-sm text-red-600">Las contraseñas no coinciden</p>
                     )}
+                    <p className="text-xs text-muted-foreground">
+                      Usa un correo real (como gmail.com) para poder confirmar tu cuenta
+                    </p>
                   </div>
 
                   <Button

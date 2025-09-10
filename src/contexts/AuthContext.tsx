@@ -80,9 +80,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData?: { username?: string; full_name?: string }) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      console.log('Starting signup process for email:', email);
+      const redirectUrl = `${window.location.origin}/auth`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -91,10 +92,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
+      console.log('Signup response:', { data, error });
+
       if (error) {
+        console.error('Signup error:', error);
+        
+        let errorMessage = error.message;
+        
+        // Handle common Supabase auth errors with friendly Spanish messages
+        if (error.message.includes('Invalid email')) {
+          errorMessage = 'El formato del correo electrónico no es válido. Usa un correo real como ejemplo@gmail.com';
+        } else if (error.message.includes('email address is invalid')) {
+          errorMessage = 'El correo electrónico no es válido. Usa un correo real (ej: ejemplo@gmail.com)';
+        } else if (error.message.includes('Password')) {
+          errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+        } else if (error.message.includes('User already registered')) {
+          errorMessage = 'Este correo ya está registrado. Intenta iniciar sesión.';
+        }
+        
         toast({
           title: "Error en el registro",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
         return { error };
@@ -102,11 +120,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "¡Registro exitoso!",
-        description: "Revisa tu correo para confirmar tu cuenta."
+        description: "Revisa tu correo para confirmar tu cuenta o inicia sesión directamente."
       });
 
       return { error: null };
     } catch (error: any) {
+      console.error('Unexpected signup error:', error);
       toast({
         title: "Error inesperado",
         description: "Ha ocurrido un error durante el registro.",
@@ -118,15 +137,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Starting signin process for email:', email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      console.log('Signin response:', { data, error });
+
       if (error) {
+        console.error('Signin error:', error);
+        
+        let errorMessage = error.message;
+        
+        // Handle common Supabase auth errors with friendly Spanish messages
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Credenciales incorrectas. Verifica tu correo y contraseña.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Debes confirmar tu correo antes de iniciar sesión.';
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = 'El formato del correo electrónico no es válido.';
+        }
+        
         toast({
           title: "Error en el inicio de sesión",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
         return { error };
@@ -139,6 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error: null };
     } catch (error: any) {
+      console.error('Unexpected signin error:', error);
       toast({
         title: "Error inesperado",
         description: "Ha ocurrido un error durante el inicio de sesión.",
