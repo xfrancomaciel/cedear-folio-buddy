@@ -30,7 +30,8 @@ import {
   ChevronRight,
   GraduationCap,
   FileText,
-  Users
+  Users,
+  Wrench
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -105,11 +106,22 @@ const portfolioItems = [
   },
 ];
 
+const herramientasItems = [
+  {
+    title: "Graficador",
+    url: "/herramientas/graficador",
+    tooltip: "Gráficos avanzados TradingView",
+  },
+];
+
 export function InvestorDashboard() {
   const location = useLocation();
   const { user, profile } = useAuth();
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(
     location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
+  );
+  const [isHerramientasOpen, setIsHerramientasOpen] = useState(
+    location.pathname.startsWith('/herramientas')
   );
   
   
@@ -220,6 +232,38 @@ export function InvestorDashboard() {
                           <SidebarMenuSubButton 
                             asChild
                             isActive={location.pathname === item.url || (item.url.includes('#') && location.pathname === '/portfolio')}
+                          >
+                            <Link to={item.url}>
+                              <span>{item.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Herramientas Collapsible Section */}
+              <Collapsible open={isHerramientasOpen} onOpenChange={setIsHerramientasOpen}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton 
+                      tooltip="Herramientas de trading"
+                      isActive={location.pathname.startsWith('/herramientas')}
+                    >
+                      <Wrench />
+                      <span>Herramientas</span>
+                      <ChevronRight className={`ml-auto transition-transform duration-200 ${isHerramientasOpen ? 'rotate-90' : ''}`} />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {herramientasItems.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton 
+                            asChild
+                            isActive={location.pathname === item.url}
                           >
                             <Link to={item.url}>
                               <span>{item.title}</span>
