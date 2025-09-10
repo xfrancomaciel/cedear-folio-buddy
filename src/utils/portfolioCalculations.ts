@@ -33,13 +33,13 @@ export const calculateVariations = (
   usdHistorico: number, 
   usdActual: number
 ) => {
-  // ARS variation
+  // ARS variation - simple percentage change in ARS price
   const variacionARS = ((precioActual - precioCompra) / precioCompra) * 100;
   
-  // USD variation considering exchange rate
-  const valorCompraUSD = precioCompra / usdHistorico;
-  const valorActualUSD = precioActual / usdActual;
-  const variacionUSD = ((valorActualUSD - valorCompraUSD) / valorCompraUSD) * 100;
+  // USD variation - convert both prices to USD first, then calculate percentage change
+  const precioCompraUSD = precioCompra / usdHistorico;
+  const precioActualUSD = precioActual / usdActual;
+  const variacionUSD = ((precioActualUSD - precioCompraUSD) / precioCompraUSD) * 100;
   
   return {
     variacionARS: parseFloat(variacionARS.toFixed(2)),
