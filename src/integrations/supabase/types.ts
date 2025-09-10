@@ -431,6 +431,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           created_at: string
@@ -497,7 +518,17 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       adjustment_type:
@@ -507,6 +538,7 @@ export type Database = {
         | "Badlar"
         | "Tasa fija"
       amortization_type: "Bullet" | "Cuotas semestrales" | "Cuotas anuales"
+      app_role: "admin" | "moderator" | "user"
       coupon_frequency: "Mensual" | "Trimestral" | "Semestral" | "Anual"
       day_count_basis: "30/360" | "Real/365" | "Real/360" | "Europa 30/360"
       instrument_type: "Bono" | "Letre" | "Nota" | "ON"
@@ -682,6 +714,7 @@ export const Constants = {
         "Tasa fija",
       ],
       amortization_type: ["Bullet", "Cuotas semestrales", "Cuotas anuales"],
+      app_role: ["admin", "moderator", "user"],
       coupon_frequency: ["Mensual", "Trimestral", "Semestral", "Anual"],
       day_count_basis: ["30/360", "Real/365", "Real/360", "Europa 30/360"],
       instrument_type: ["Bono", "Letre", "Nota", "ON"],
