@@ -72,19 +72,6 @@ const navigationItems = [
     icon: FileText,
     tooltip: "Reportes y análisis",
   },
-  {
-    title: "Comunidad",
-    url: "https://chat.bdiconsultora.com/signup_user_complete/?id=7z8bfgqz9j8nbbf7z78n6q6opw&md=link&sbr=fa",
-    icon: Users,
-    tooltip: "Comunidad de inversores",
-    external: true,
-  },
-  {
-    title: "YouTube",
-    url: "/youtube",
-    icon: PlayCircle,
-    tooltip: "Canal de YouTube oficial",
-  },
 ];
 
 const portfolioItems = [
@@ -211,17 +198,6 @@ export function InvestorDashboard() {
                       <item.icon />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
-                  ) : item.external ? (
-                    <SidebarMenuButton 
-                      asChild 
-                      tooltip={item.tooltip}
-                    >
-                      <a href={item.url} target="_blank" rel="noopener noreferrer">
-                        <item.icon />
-                        <span>{item.title}</span>
-                        <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
-                      </a>
-                    </SidebarMenuButton>
                   ) : (
                     <SidebarMenuButton 
                       asChild 
@@ -308,6 +284,32 @@ export function InvestorDashboard() {
       </SidebarContent>
       
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              asChild 
+              tooltip="Canal de YouTube oficial"
+              isActive={location.pathname === '/youtube'}
+            >
+              <Link to="/youtube">
+                <PlayCircle />
+                <span>YouTube</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              asChild 
+              tooltip="Comunidad de inversores"
+            >
+              <a href="https://chat.bdiconsultora.com/signup_user_complete/?id=7z8bfgqz9j8nbbf7z78n6q6opw&md=link&sbr=fa" target="_blank" rel="noopener noreferrer">
+                <Users />
+                <span>Comunidad</span>
+                <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <DollarRates />
         <SidebarMenu>
           <SidebarMenuItem>
