@@ -139,7 +139,7 @@ export default function Auth() {
           <div className="h-12 w-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
             <div className="h-6 w-6 bg-primary-foreground rounded-br-sm rounded-tr-xs rounded-tl-sm rounded-bl-xs" />
           </div>
-          <h1 className="text-2xl font-bold">InvestorSuite</h1>
+          <h1 className="text-2xl font-bold">BDI Suite</h1>
           <p className="text-muted-foreground">Tu plataforma de inversiones</p>
         </div>
 

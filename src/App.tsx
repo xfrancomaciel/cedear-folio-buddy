@@ -99,7 +99,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
           <SidebarTrigger className="-ml-1" />
           <div className="flex items-center gap-2">
             <div className="h-5 w-6 bg-primary rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-            <span className="font-semibold text-foreground">InvestorSuite</span>
+            <span className="font-semibold text-foreground">BDI Suite</span>
           </div>
         </header>
         <div className="flex-1 overflow-auto">

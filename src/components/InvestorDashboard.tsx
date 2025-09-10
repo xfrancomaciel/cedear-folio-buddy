@@ -122,7 +122,7 @@ export function InvestorDashboard() {
                   <div className="h-4 w-4 bg-primary-foreground rounded-br-sm rounded-tr-xs rounded-tl-sm rounded-bl-xs" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">InvestorSuite</span>
+                  <span className="truncate font-semibold">BDI Suite</span>
                   <span className="truncate text-xs">Suite de inversiones</span>
                 </div>
               </Link>
