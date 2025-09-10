@@ -13,6 +13,7 @@ import CedearPrices from "./pages/CedearPrices";
 import Dashboard from "./pages/Dashboard";
 import BondsAnalytics from "./pages/BondsAnalytics";
 import Settings from "./pages/Settings";
+import Reports from "./pages/Reports";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -64,6 +65,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout><Settings /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reportes" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><Reports /></AppLayout>
                 </ProtectedRoute>
               } 
             />

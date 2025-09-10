@@ -64,9 +64,9 @@ const navigationItems = [
   },
   {
     title: "Reportes",
+    url: "/reportes",
     icon: FileText,
     tooltip: "Reportes y análisis",
-    comingSoon: true,
   },
   {
     title: "Comunidad",
