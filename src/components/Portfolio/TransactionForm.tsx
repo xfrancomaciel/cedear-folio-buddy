@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { getAllTickers, isValidTicker, getCEDEARInfo, validateTransaction } from '@/data/cedearsData';
 import { useCedearPrices } from '@/hooks/useCedearPrices';
@@ -29,6 +30,7 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
   const tickers = getAllTickers();
   const { prices, loading } = useCedearPrices(tickers);
   const [isPriceAutoFilled, setIsPriceAutoFilled] = useState(false);
+  const [isAutoCompleteEnabled, setIsAutoCompleteEnabled] = useState(true);
   
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
@@ -48,18 +50,18 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
 
   const [showPriceUpdate, setShowPriceUpdate] = useState(false);
 
-  // Auto-fill price when ticker changes
+  // Auto-fill price when ticker changes (only if auto-complete is enabled)
   useEffect(() => {
-    if (formData.ticker && Object.keys(prices).length > 0) {
+    if (isAutoCompleteEnabled && formData.ticker && Object.keys(prices).length > 0) {
       const priceData = prices[formData.ticker];
       if (priceData && priceData.px_mid) {
         setFormData(prev => ({ ...prev, precio_ars: priceData.px_mid.toString() }));
         setIsPriceAutoFilled(true);
       }
-    } else {
+    } else if (!isAutoCompleteEnabled) {
       setIsPriceAutoFilled(false);
     }
-  }, [formData.ticker, prices]);
+  }, [formData.ticker, prices, isAutoCompleteEnabled]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,15 +209,32 @@ export const TransactionForm = ({ onAddTransaction, onUpdatePrice }: Transaction
               </div>
 
               <div>
-                <Label htmlFor="precio" className="flex items-center gap-2">
-                  Precio (ARS)
-                  {isPriceAutoFilled && (
-                    <Badge variant="secondary" className="text-xs">
-                      <Zap className="w-3 h-3 mr-1" />
-                      Auto-completado
-                    </Badge>
-                  )}
-                </Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="precio" className="flex items-center gap-2">
+                    Precio (ARS)
+                    {isPriceAutoFilled && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Zap className="w-3 h-3 mr-1" />
+                        Auto-completado
+                      </Badge>
+                    )}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="auto-complete" className="text-xs text-muted-foreground">
+                      Auto-completar
+                    </Label>
+                    <Switch
+                      id="auto-complete"
+                      checked={isAutoCompleteEnabled}
+                      onCheckedChange={(checked) => {
+                        setIsAutoCompleteEnabled(checked);
+                        if (!checked) {
+                          setIsPriceAutoFilled(false);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
                 <Input
                   id="precio"
                   type="number"
