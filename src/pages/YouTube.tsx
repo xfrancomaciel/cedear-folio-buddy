@@ -14,8 +14,8 @@ const YouTube = () => {
         <div className="aspect-video w-full max-w-full">
           <iframe
             className="w-full h-full rounded-lg border"
-            src="https://www.youtube.com/embed/videoseries?list=UULFumM8w-jv2jBSNON-QoGg"
-            title="BDI Consultora YouTube Channel"
+            src="https://www.youtube.com/embed/D1gLsZMgK9k"
+            title="BDI Consultora - Video Reciente"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
