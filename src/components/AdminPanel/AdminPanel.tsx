@@ -11,7 +11,8 @@ import {
   ShieldCheck, 
   Users, 
   ChevronRight,
-  Settings 
+  Settings,
+  FileText
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -21,6 +22,12 @@ const adminItems = [
     url: "/admin/users",
     icon: Users,
     tooltip: "Administrar usuarios del sistema"
+  },
+  {
+    title: "Gestión de Reportes",
+    url: "/admin/reports",
+    icon: FileText,
+    tooltip: "Administrar reportes y publicaciones"
   }
 ];
 

@@ -9,13 +9,16 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface Report {
-  id: number;
+  id: string;
   title: string;
-  description: string;
-  coverImage: string;
-  pdfUrl: string;
-  date: string;
-  category: string;
+  description: string | null;
+  coverImage?: string;
+  cover_image_url?: string | null;
+  pdfUrl?: string;
+  pdf_url?: string | null;
+  date?: string;
+  created_at?: string;
+  category?: string;
   status: string;
 }
 
@@ -27,8 +30,11 @@ interface ReportCardProps {
 export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(report.title);
-  const [editedDescription, setEditedDescription] = useState(report.description);
-  const [editedCoverUrl, setEditedCoverUrl] = useState(report.coverImage);
+  const [editedDescription, setEditedDescription] = useState(report.description || "");
+  const [editedCoverUrl, setEditedCoverUrl] = useState(report.coverImage || report.cover_image_url || "");
+
+  const coverImageUrl = report.coverImage || report.cover_image_url || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop";
+  const reportDate = report.date || (report.created_at ? new Date(report.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
 
   const handleSave = () => {
     // Here you would typically save to backend
@@ -38,24 +44,24 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => 
 
   const handleCancel = () => {
     setEditedTitle(report.title);
-    setEditedDescription(report.description);
-    setEditedCoverUrl(report.coverImage);
+    setEditedDescription(report.description || "");
+    setEditedCoverUrl(report.coverImage || report.cover_image_url || "");
     setIsEditing(false);
   };
 
-  const statusColor = report.status === "Publicado" ? "default" : "secondary";
+  const statusColor = report.status === "published" || report.status === "Publicado" ? "default" : "secondary";
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
       <div className="relative">
         <div 
           className="h-48 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
-          style={{ backgroundImage: `url(${report.coverImage})` }}
+          style={{ backgroundImage: `url(${coverImageUrl})` }}
         >
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
           <div className="absolute top-2 right-2 flex gap-1">
             <Badge variant={statusColor} className="text-xs">
-              {report.status}
+              {report.status === "published" ? "Publicado" : "Borrador"}
             </Badge>
           </div>
           <div className="absolute bottom-2 left-2">
@@ -74,7 +80,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => 
             </h3>
             <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
               <Calendar className="h-3 w-3" />
-              {format(new Date(report.date), "dd MMM yyyy", { locale: es })}
+              {format(new Date(reportDate), "dd MMM yyyy", { locale: es })}
             </div>
           </div>
           
@@ -131,7 +137,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => 
 
       <CardContent className="pt-0">
         <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-          {report.description}
+          {report.description || "Sin descripción"}
         </p>
         
         <div className="flex gap-2">

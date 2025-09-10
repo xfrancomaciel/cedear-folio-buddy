@@ -4,13 +4,16 @@ import { Download, ExternalLink, X } from "lucide-react";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Report {
-  id: number;
+  id: string;
   title: string;
-  description: string;
-  coverImage: string;
-  pdfUrl: string;
-  date: string;
-  category: string;
+  description: string | null;
+  coverImage?: string;
+  cover_image_url?: string | null;
+  pdfUrl?: string;
+  pdf_url?: string | null;
+  date?: string;
+  created_at?: string;
+  category?: string;
   status: string;
 }
 
@@ -25,7 +28,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ report }) => {
         <div className="flex items-center justify-between">
           <div>
             <DialogTitle className="text-lg">{report.title}</DialogTitle>
-            <p className="text-sm text-muted-foreground mt-1">{report.description}</p>
+            <p className="text-sm text-muted-foreground mt-1">{report.description || "Sin descripción"}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">

@@ -9,68 +9,43 @@ import { Plus, Search, Filter, Download, Menu } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useMobileOptimizations } from "@/hooks/useMobileOptimizations";
+import { useReportsManagement, Report } from "@/hooks/useReportsManagement";
+import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 
-// Mock data for reports
-const mockReports = [
-  {
-    id: 1,
-    title: "Análisis Trimestral Q4 2024",
-    description: "Reporte completo del rendimiento del mercado en el último trimestre",
-    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
-    pdfUrl: "/sample-report.pdf",
-    date: "2024-12-15",
-    category: "Trimestral",
-    status: "Publicado"
-  },
-  {
-    id: 2,
-    title: "Bonos Argentinos - Diciembre 2024",
-    description: "Análisis detallado del comportamiento de los bonos soberanos",
-    coverImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop",
-    pdfUrl: "/bonds-report.pdf",
-    date: "2024-12-10",
-    category: "Bonos",
-    status: "Publicado"
-  },
-  {
-    id: 3,
-    title: "CEDEARs Outlook 2025",
-    description: "Perspectivas y proyecciones para CEDEARs en el próximo año",
-    coverImage: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=300&fit=crop",
-    pdfUrl: "/cedears-outlook.pdf",
-    date: "2024-12-08",
-    category: "CEDEARs",
-    status: "Borrador"
-  },
-  {
-    id: 4,
-    title: "Informe Semanal - Semana 50",
-    description: "Resumen semanal de los principales movimientos del mercado",
-    coverImage: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=400&h=300&fit=crop",
-    pdfUrl: "/weekly-report.pdf",
-    date: "2024-12-13",
-    category: "Semanal",
-    status: "Publicado"
-  }
-];
-
 const Reports = () => {
+  const { reports, categories, loading, fetchReports } = useReportsManagement();
+  const { isAdmin } = useUserRole();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todos");
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-  const categories = ["Todos", "Trimestral", "Bonos", "CEDEARs", "Semanal"];
+  // Load reports based on user role
+  React.useEffect(() => {
+    fetchReports(isAdmin); // Admin sees all, users see only published
+  }, [isAdmin]);
 
-  const filteredReports = mockReports.filter(report => {
+  const filteredReports = reports.filter(report => {
     const matchesSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Todos" || report.category === selectedCategory;
+                         (report.description && report.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === "Todos" || report.category?.name === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
+  const availableCategories = ["Todos", ...categories.map(cat => cat.name)];
+
   const { isMobile, touchTargetSize, cardSpacing } = useMobileOptimizations();
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Cargando reportes...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("p-4 md:p-6", cardSpacing)}>
@@ -85,10 +60,15 @@ const Reports = () => {
               Análisis y reportes de mercado
             </p>
           </div>
-          <Button className={cn("flex items-center gap-2", touchTargetSize)}>
-            <Plus className="h-4 w-4" />
-            {isMobile ? "Nuevo" : "Nuevo Reporte"}
-          </Button>
+          {isAdmin && (
+            <Button 
+              className={cn("flex items-center gap-2", touchTargetSize)}
+              onClick={() => window.location.href = '/admin/reports'}
+            >
+              <Plus className="h-4 w-4" />
+              {isMobile ? "Nuevo" : "Nuevo Reporte"}
+            </Button>
+          )}
         </div>
 
         {/* Search and Filters */}
@@ -103,7 +83,7 @@ const Reports = () => {
             />
           </div>
             <div className="flex gap-2 flex-wrap">
-              {categories.map((category) => (
+              {availableCategories.map((category) => (
                 <Badge
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
@@ -127,7 +107,13 @@ const Reports = () => {
         {filteredReports.map((report) => (
           <ReportCard
             key={report.id}
-            report={report}
+            report={{
+              ...report,
+              coverImage: report.cover_image_url || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
+              pdfUrl: report.pdf_url || "",
+              date: new Date(report.created_at).toISOString().split('T')[0],
+              category: report.category?.name || "Sin categoría"
+            }}
             onPreview={() => setSelectedReport(report)}
           />
         ))}
@@ -150,7 +136,12 @@ const Reports = () => {
       {selectedReport && (
         <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
           <DialogContent className="max-w-4xl h-[80vh]">
-            <PDFPreview report={selectedReport} />
+            <PDFPreview report={{
+              ...selectedReport,
+              pdfUrl: selectedReport.pdf_url || "",
+              coverImage: selectedReport.cover_image_url || "",
+              category: selectedReport.category?.name || "Sin categoría"
+            }} />
           </DialogContent>
         </Dialog>
       )}
