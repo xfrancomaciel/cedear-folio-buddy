@@ -8,6 +8,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InvestorDashboard } from "@/components/InvestorDashboard";
+import { PWAInstallBanner } from "@/components/PWAInstallBanner";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import Index from "./pages/Index";
 import CedearPrices from "./pages/CedearPrices";
 import Dashboard from "./pages/Dashboard";
@@ -107,6 +109,8 @@ const App = () => (
             />
           </Routes>
         </BrowserRouter>
+        <PWAInstallBanner />
+        <OfflineIndicator />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

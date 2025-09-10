@@ -1,0 +1,65 @@
+{
+  "name": "BDI Suite - Gestión de Cartera de Inversiones",
+  "short_name": "BDI Suite",
+  "description": "Herramienta profesional para trackear y gestionar tu cartera de CEDEARs argentinos con cálculos precisos de ganancias.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["finance", "business", "productivity"],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mi Portfolio",
+      "short_name": "Portfolio",
+      "description": "Ver mi cartera de inversiones",
+      "url": "/?shortcut=portfolio",
+      "icons": [{"src": "/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Precios CEDEAR",
+      "short_name": "Precios", 
+      "description": "Ver precios actuales de CEDEARs",
+      "url": "/acciones?shortcut=prices",
+      "icons": [{"src": "/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Formaciones",
+      "short_name": "Cursos",
+      "description": "Acceder a formaciones y cursos",
+      "url": "/formaciones?shortcut=courses", 
+      "icons": [{"src": "/icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
