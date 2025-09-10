@@ -142,11 +142,11 @@ export const PositionsTable = ({ positions, onSellTransaction, currentPrices }: 
                       </div>
                     </td>
                     <td className="text-right py-4 px-2">
-                      <div className="flex flex-col">
+                      <div className="flex flex-col items-end">
                         <span className={`font-semibold ${position.ganancia_no_realizada_ars >= 0 ? 'gain-positive' : 'gain-negative'}`}>
                           {formatCurrency(position.ganancia_no_realizada_ars, 'ARS')}
                         </span>
-                        <div className="flex gap-2 text-xs">
+                        <div className="flex gap-1 text-xs justify-end">
                           <span className={`${position.variacion_ars >= 0 ? 'gain-positive' : 'gain-negative'}`}>
                             ARS: {formatPercentage(position.variacion_ars)}
                           </span>
