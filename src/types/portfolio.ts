@@ -1,5 +1,6 @@
 export interface Transaction {
   id: string;
+  user_id: string;
   fecha: string;
   tipo: 'compra' | 'venta';
   ticker: string;

@@ -4,6 +4,7 @@ import { calculatePortfolioSummary, enhanceTransaction } from '@/utils/portfolio
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCedearPrices } from './useCedearPrices';
+import { useAuth } from '@/contexts/AuthContext';
 
 const STORAGE_KEYS = {
   TRANSACTIONS: 'cedear-transactions',
@@ -16,6 +17,7 @@ export const usePortfolioData = () => {
   const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Get unique tickers from transactions for real-time price updates
   const tickers = [...new Set(transactions.map(tx => tx.ticker))];
@@ -29,6 +31,8 @@ export const usePortfolioData = () => {
 
   // Migrate localStorage data to Supabase
   const migrateLocalStorageData = async () => {
+    if (!user?.id) return;
+    
     try {
       // Check if we have localStorage data to migrate
       const savedTransactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
@@ -41,6 +45,7 @@ export const usePortfolioData = () => {
         // Insert each transaction into Supabase
         for (const tx of localTransactions) {
           const enhanced = enhanceTransaction({
+            user_id: user.id,
             fecha: tx.fecha,
             tipo: tx.tipo,
             ticker: tx.ticker,
@@ -52,6 +57,7 @@ export const usePortfolioData = () => {
           });
 
           await supabase.from('transactions').insert({
+            user_id: user.id,
             fecha: enhanced.fecha,
             tipo: enhanced.tipo,
             ticker: enhanced.ticker,
@@ -103,13 +109,16 @@ export const usePortfolioData = () => {
 
   // Load data from Supabase
   const loadData = async () => {
+    if (!user?.id) return;
+    
     try {
       setIsLoading(true);
       
-      // Load transactions
+      // Load transactions for current user only
       const { data: transactionsData, error: transactionsError } = await supabase
         .from('transactions')
         .select('*')
+        .eq('user_id', user.id)
         .order('fecha', { ascending: false });
 
       if (transactionsError) {
@@ -161,14 +170,16 @@ export const usePortfolioData = () => {
 
   useEffect(() => {
     const initializeData = async () => {
-      // First try to migrate any existing localStorage data
-      await migrateLocalStorageData();
-      // Then load all data from Supabase
-      await loadData();
+      if (user?.id) {
+        // First try to migrate any existing localStorage data
+        await migrateLocalStorageData();
+        // Then load all data from Supabase
+        await loadData();
+      }
     };
     
     initializeData();
-  }, []);
+  }, [user?.id]);
 
   // Recalculate portfolio summary when data changes
   useEffect(() => {
@@ -200,17 +211,28 @@ export const usePortfolioData = () => {
     cantidad: number;
     usd_rate_historico: number;
   }) => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "Debes estar autenticado para agregar transacciones",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const total_ars = transaction.precio_ars * transaction.cantidad;
       const total_usd = total_ars / transaction.usd_rate_historico;
       
       const enhancedTransaction = enhanceTransaction({
+        user_id: user.id,
         ...transaction,
         total_ars,
         total_usd
       });
 
       const { data, error } = await supabase.from('transactions').insert({
+        user_id: user.id,
         fecha: enhancedTransaction.fecha,
         tipo: enhancedTransaction.tipo,
         ticker: enhancedTransaction.ticker,
@@ -329,9 +351,18 @@ export const usePortfolioData = () => {
   };
 
   const clearAllData = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "Debes estar autenticado para eliminar datos",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // Delete all transactions and prices
-      const { error: txError } = await supabase.from('transactions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      // Delete all user's transactions and prices
+      const { error: txError } = await supabase.from('transactions').delete().eq('user_id', user.id);
       const { error: pricesError } = await supabase.from('current_prices').delete().neq('ticker', 'NONE');
 
       if (txError || pricesError) {

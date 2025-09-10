@@ -388,6 +388,7 @@ export type Database = {
           updated_at: string
           usd_por_cedear: number
           usd_rate_historico: number
+          user_id: string
         }
         Insert: {
           cantidad: number
@@ -405,6 +406,7 @@ export type Database = {
           updated_at?: string
           usd_por_cedear: number
           usd_rate_historico: number
+          user_id: string
         }
         Update: {
           cantidad?: number
@@ -422,6 +424,7 @@ export type Database = {
           updated_at?: string
           usd_por_cedear?: number
           usd_rate_historico?: number
+          user_id?: string
         }
         Relationships: []
       }
