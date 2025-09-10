@@ -52,7 +52,7 @@ const navigationItems = [
     tooltip: "Análisis de bonos",
   },
   {
-    title: "Acciones",
+    title: "CEDEARs",
     url: "/acciones",
     icon: DollarSign,
     tooltip: "Precios CEDEAR",
