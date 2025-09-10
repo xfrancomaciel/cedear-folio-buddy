@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ReportCard } from "@/components/Reports/ReportCard";
 import { PDFPreview } from "@/components/Reports/PDFPreview";
-import { Plus, Search, Filter, Download } from "lucide-react";
+import { Plus, Search, Filter, Download, Menu } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useMobileOptimizations } from "@/hooks/useMobileOptimizations";
+import { cn } from "@/lib/utils";
 
 // Mock data for reports
 const mockReports = [
@@ -66,53 +69,61 @@ const Reports = () => {
     return matchesSearch && matchesCategory;
   });
 
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Reportes</h1>
-          <p className="text-muted-foreground mt-2">
-            Accede a todos los análisis y reportes de mercado
-          </p>
-        </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nuevo Reporte
-        </Button>
-      </div>
+  const { isMobile, touchTargetSize, cardSpacing } = useMobileOptimizations();
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input 
-                placeholder="Buscar reportes..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+  return (
+    <div className={cn("p-4 md:p-6", cardSpacing)}>
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div className="flex-1">
+            <h1 className={cn("font-bold text-foreground", isMobile ? "text-2xl" : "text-3xl")}>
+              Reportes
+            </h1>
+            <p className={cn("text-muted-foreground mt-2", isMobile ? "text-base" : "text-sm")}>
+              Análisis y reportes de mercado
+            </p>
+          </div>
+          <Button className={cn("flex items-center gap-2", touchTargetSize)}>
+            <Plus className="h-4 w-4" />
+            {isMobile ? "Nuevo" : "Nuevo Reporte"}
+          </Button>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input 
+              placeholder={isMobile ? "Buscar..." : "Buscar reportes..."} 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={cn("pl-10", touchTargetSize)}
+            />
+          </div>
             <div className="flex gap-2 flex-wrap">
               {categories.map((category) => (
                 <Badge
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
-                  className="cursor-pointer"
+                  className="cursor-pointer hover:bg-muted"
                   onClick={() => setSelectedCategory(category)}
                 >
                   {category}
                 </Badge>
               ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Reports Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className={cn(
+        "grid gap-4",
+        isMobile 
+          ? "grid-cols-1" 
+          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      )}>
         {filteredReports.map((report) => (
           <ReportCard
             key={report.id}

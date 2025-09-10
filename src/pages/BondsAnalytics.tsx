@@ -4,14 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TouchOptimizedChart } from "@/components/TouchOptimizedChart";
 import { Search, RefreshCw, TrendingUp, TrendingDown } from "lucide-react";
 import { useBondsData, useBondSearch } from "@/hooks/useBondsData";
+import { useMobileOptimizations } from "@/hooks/useMobileOptimizations";
 import { BondPrice } from "@/types/bonds";
+import { cn } from "@/lib/utils";
 
 export default function BondsAnalytics() {
   const { bondPrices, marketMetrics, isLoading, triggerDataRefresh } = useBondsData();
   const [searchTerm, setSearchTerm] = useState("");
   const filteredBonds = useBondSearch(bondPrices, searchTerm);
+  const { isMobile, touchTargetSize, cardSpacing } = useMobileOptimizations();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -51,28 +55,34 @@ export default function BondsAnalytics() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className={cn("flex-1 p-4 md:p-6", cardSpacing)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Análisis de Bonos</h1>
-          <p className="text-muted-foreground">
-            Precios y métricas en tiempo real de bonos argentinos
+          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+            Análisis de Bonos
+          </h1>
+          <p className={cn("text-muted-foreground", isMobile ? "text-base" : "text-sm")}>
+            Precios y métricas en tiempo real
           </p>
         </div>
         <Button
           onClick={triggerDataRefresh}
           disabled={isLoading}
-          size="sm"
+          size={isMobile ? "default" : "sm"}
           variant="outline"
+          className={touchTargetSize}
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Actualizar
+          {isMobile ? "Actualizar" : "Actualizar"}
         </Button>
       </div>
 
       {/* Market Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className={cn(
+        "grid gap-4",
+        isMobile ? "grid-cols-2" : "grid-cols-1 md:grid-cols-4"
+      )}>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -131,22 +141,26 @@ export default function BondsAnalytics() {
 
       {/* Search and Filter */}
       <Card>
-        <CardHeader>
-          <CardTitle>Panel de Control</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className={isMobile ? "text-lg" : "text-base"}>Panel de Control</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por ticker..."
+                placeholder={isMobile ? "Buscar ticker..." : "Buscar por ticker..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className={cn("pl-9", touchTargetSize)}
               />
             </div>
-            <Button variant="outline" onClick={() => setSearchTerm("")}>
-              Limpiar
+            <Button 
+              variant="outline" 
+              onClick={() => setSearchTerm("")}
+              className={touchTargetSize}
+            >
+              {isMobile ? "×" : "Limpiar"}
             </Button>
           </div>
         </CardContent>
@@ -154,11 +168,11 @@ export default function BondsAnalytics() {
 
       {/* Bonds Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Instrumentos de Renta Fija</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className={isMobile ? "text-lg" : "text-base"}>Instrumentos de Renta Fija</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -177,7 +191,7 @@ export default function BondsAnalytics() {
                 {filteredBonds.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                      {searchTerm ? "No se encontraron bonos con ese criterio de búsqueda" : "No hay datos de bonos disponibles"}
+                      {searchTerm ? "No se encontraron bonos con ese criterio" : "No hay datos disponibles"}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -196,8 +210,7 @@ export default function BondsAnalytics() {
                         {bond.px_ask ? formatCurrency(bond.px_ask) : "-"}
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        {bond.px_mid ? formatCurrency(bond.px_mid) : 
-                         bond.px_close ? formatCurrency(bond.px_close) : "-"}
+                        {bond.px_mid ? formatCurrency(bond.px_mid) : (bond.px_close ? formatCurrency(bond.px_close) : "-")}
                       </TableCell>
                       <TableCell className="text-right">
                         {formatVolume(bond.volume)}

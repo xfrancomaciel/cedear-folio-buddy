@@ -4,15 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
 import { useCedearPrices } from '@/hooks/useCedearPrices';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 import { formatCurrency } from '@/utils/portfolioCalculations';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const CedearPrices = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const { isMobile, touchTargetSize, cardSpacing } = useMobileOptimizations();
 
   // Get all tracked CEDEARs
   const TRACKED_CEDEARS = [
@@ -51,12 +54,12 @@ const CedearPrices = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="container mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gradient">
+        <div className={cn("mb-4 md:mb-6", cardSpacing)}>
+          <h1 className={cn("font-bold text-gradient", isMobile ? "text-2xl" : "text-3xl")}>
             Precios CEDEAR en Tiempo Real
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Precios actualizados automáticamente desde data912.com
+          <p className={cn("text-muted-foreground mt-1", isMobile ? "text-base" : "text-sm")}>
+            Precios desde data912.com
           </p>
         </div>
 
@@ -70,29 +73,30 @@ const CedearPrices = () => {
 
         {/* Search and Controls */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Precios CEDEAR</span>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <span className={isMobile ? "text-lg" : "text-base"}>Precios CEDEAR</span>
               <Button 
                 variant="outline" 
-                size="sm" 
+                size={isMobile ? "default" : "sm"}
                 onClick={refresh}
                 disabled={loading}
+                className={touchTargetSize}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Actualizar
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cardSpacing}>
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por ticker (ej: AAPL, TSLA, GOOGL)..."
+                placeholder={isMobile ? "Buscar ticker..." : "Buscar por ticker (ej: AAPL, TSLA, GOOGL)..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className={cn("pl-10", touchTargetSize)}
               />
             </div>
 
@@ -114,10 +118,10 @@ const CedearPrices = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Ticker</TableHead>
-                      <TableHead className="text-right">Precio Compra</TableHead>
-                      <TableHead className="text-right">Precio Venta</TableHead>
-                      <TableHead className="text-right">Precio Medio</TableHead>
-                      <TableHead className="text-right">Último Cierre</TableHead>
+                      <TableHead className="text-right">Compra</TableHead>
+                      <TableHead className="text-right">Venta</TableHead>
+                      <TableHead className="text-right">Medio</TableHead>
+                      <TableHead className="text-right">Cierre</TableHead>
                       <TableHead className="text-right">Volumen</TableHead>
                       <TableHead className="text-right">Variación %</TableHead>
                       <TableHead className="text-right">Actualizado</TableHead>
@@ -163,7 +167,7 @@ const CedearPrices = () => {
                             {new Date(price.last_updated).toLocaleTimeString('es-AR', {
                               hour: '2-digit',
                               minute: '2-digit',
-                              second: '2-digit'
+                              ...(isMobile ? {} : { second: '2-digit' })
                             })}
                           </TableCell>
                         </TableRow>
@@ -177,7 +181,10 @@ const CedearPrices = () => {
 
         {/* Summary Stats */}
         {filteredPrices.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={cn(
+            "grid gap-4",
+            isMobile ? "grid-cols-3" : "grid-cols-1 md:grid-cols-3"
+          )}>
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-2 text-green-600">

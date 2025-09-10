@@ -1,19 +1,25 @@
 import { PortfolioSummary } from '@/types/portfolio';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency, formatPercentage } from '@/utils/portfolioCalculations';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 import { TrendingUp, TrendingDown, DollarSign, PieChart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PortfolioSummaryProps {
   summary: PortfolioSummary;
 }
 
 export const PortfolioSummaryCard = ({ summary }: PortfolioSummaryProps) => {
+  const { isMobile } = useMobileOptimizations();
   const totalGainARS = summary.ganancia_total_no_realizada_ars + summary.ganancia_total_realizada_ars;
   const totalGainUSD = summary.ganancia_total_no_realizada_usd + summary.ganancia_total_realizada_usd;
   const totalGainPercentageARS = summary.valor_total_ars > 0 ? (totalGainARS / (summary.valor_total_ars - totalGainARS)) * 100 : 0;
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className={cn(
+      "grid gap-4",
+      isMobile ? "grid-cols-2" : "gap-6 md:grid-cols-2 lg:grid-cols-4"
+    )}>
       {/* Total Value */}
       <Card className="card-financial">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
