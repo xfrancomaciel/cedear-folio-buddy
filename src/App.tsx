@@ -98,7 +98,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6" />
+            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
             <span className="font-semibold text-foreground">BDI Suite</span>
           </div>
         </header>

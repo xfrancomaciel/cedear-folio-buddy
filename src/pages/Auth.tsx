@@ -136,8 +136,8 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="h-12 w-12 bg-background rounded-lg mx-auto mb-4 flex items-center justify-center border">
-            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-8 w-8" />
+          <div className="h-12 w-12 mx-auto mb-4 flex items-center justify-center">
+            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-10 w-10 object-contain" />
           </div>
           <h1 className="text-2xl font-bold">BDI Suite</h1>
           <p className="text-muted-foreground">Tu plataforma de inversiones</p>
