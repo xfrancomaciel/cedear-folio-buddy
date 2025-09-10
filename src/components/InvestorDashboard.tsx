@@ -27,11 +27,15 @@ import {
   User,
   Plus,
   History,
-  ChevronRight
+  ChevronRight,
+  GraduationCap,
+  FileText,
+  Users
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 const navigationItems = [
   {
@@ -51,6 +55,24 @@ const navigationItems = [
     url: "/acciones",
     icon: DollarSign,
     tooltip: "Precios CEDEAR",
+  },
+  {
+    title: "Formaciones",
+    icon: GraduationCap,
+    tooltip: "Cursos y formación",
+    comingSoon: true,
+  },
+  {
+    title: "Reportes",
+    icon: FileText,
+    tooltip: "Reportes y análisis",
+    comingSoon: true,
+  },
+  {
+    title: "Comunidad",
+    icon: Users,
+    tooltip: "Comunidad de inversores",
+    comingSoon: true,
   },
 ];
 
@@ -110,6 +132,12 @@ export function InvestorDashboard() {
     if (user?.email) return user.email.slice(0, 2).toUpperCase();
     return 'U';
   };
+
+  const handleComingSoon = (feature: string) => {
+    toast.info(`${feature} - Próximamente disponible`, {
+      description: "Esta funcionalidad estará disponible en futuras actualizaciones."
+    });
+  };
   
   return (
     <Sidebar collapsible="icon">
@@ -138,16 +166,26 @@ export function InvestorDashboard() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    tooltip={item.tooltip}
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
+                  {item.comingSoon ? (
+                    <SidebarMenuButton 
+                      tooltip={item.tooltip}
+                      onClick={() => handleComingSoon(item.title)}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton 
+                      asChild 
+                      tooltip={item.tooltip}
+                      isActive={location.pathname === item.url}
+                    >
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
               
