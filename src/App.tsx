@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import BondsAnalytics from "./pages/BondsAnalytics";
 import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
+import Formaciones from "./pages/Formaciones";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -68,14 +69,26 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/reportes" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout><Reports /></AppLayout>
-                </ProtectedRoute>
-              } 
-            />
+          <Route
+            path="/reportes"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Reports />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/formaciones"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Formaciones />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
             <Route 
               path="/" 
               element={

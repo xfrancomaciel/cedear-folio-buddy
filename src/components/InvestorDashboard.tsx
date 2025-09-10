@@ -58,9 +58,9 @@ const navigationItems = [
   },
   {
     title: "Formaciones",
+    url: "/formaciones",
     icon: GraduationCap,
     tooltip: "Cursos y formación",
-    comingSoon: true,
   },
   {
     title: "Reportes",
@@ -167,7 +167,7 @@ export function InvestorDashboard() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  {item.comingSoon ? (
+                  {'comingSoon' in item && item.comingSoon ? (
                     <SidebarMenuButton 
                       tooltip={item.tooltip}
                       onClick={() => handleComingSoon(item.title)}
