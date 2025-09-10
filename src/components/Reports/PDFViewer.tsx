@@ -4,9 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 // Configure PDF.js worker with fallback
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+}
 
 interface PDFViewerProps {
   pdfUrl: string;
@@ -19,12 +23,28 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, className = '' }) 
   const [scale, setScale] = useState<number>(1.0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     console.log('PDFViewer mounted with URL:', pdfUrl);
     setLoading(true);
     setError(null);
     setPageNumber(1);
+    setIsDocumentLoaded(false);
+    
+    // Test if PDF URL is accessible
+    fetch(pdfUrl, { method: 'HEAD' })
+      .then(response => {
+        console.log('PDF accessibility test:', response.status, response.statusText);
+        if (!response.ok) {
+          throw new Error(`PDF no accessible: ${response.status} ${response.statusText}`);
+        }
+      })
+      .catch(error => {
+        console.error('PDF accessibility error:', error);
+        setError(`No se puede acceder al PDF: ${error.message}`);
+        setLoading(false);
+      });
   }, [pdfUrl]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -32,13 +52,26 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, className = '' }) 
     setNumPages(numPages);
     setLoading(false);
     setError(null);
+    setIsDocumentLoaded(true);
+    toast.success(`PDF cargado exitosamente (${numPages} páginas)`);
   };
 
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      pdfUrl
+    });
     setError(`Error al cargar el PDF: ${error.message}`);
     toast.error('Error al cargar el PDF');
     setLoading(false);
+    setIsDocumentLoaded(false);
+  };
+
+  const onDocumentLoadProgress = (progress: { loaded: number; total: number }) => {
+    const percentage = Math.round((progress.loaded / progress.total) * 100);
+    console.log(`PDF loading progress: ${percentage}%`);
   };
 
   const changePage = (offset: number) => {
@@ -135,30 +168,48 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, className = '' }) 
             file={pdfUrl}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
+            onLoadProgress={onDocumentLoadProgress}
             options={{
               cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
               cMapPacked: true,
               standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
-              verbosity: 0,
+              verbosity: 1,
             }}
             loading={
-              <div className="flex items-center justify-center h-96 bg-white rounded">
+              <div className="flex items-center justify-center h-96 bg-white rounded min-w-[400px]">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   <p className="mt-2 text-sm text-muted-foreground">Cargando PDF...</p>
                 </div>
               </div>
             }
-          >
-            <Page
-              pageNumber={pageNumber}
-              scale={scale}
-              loading={
-                <div className="flex items-center justify-center h-96 bg-white rounded">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            error={
+              <div className="flex items-center justify-center h-96 bg-white rounded min-w-[400px]">
+                <div className="text-center text-red-500">
+                  <p>Error al cargar el PDF</p>
+                  <p className="text-sm mt-1">{error}</p>
                 </div>
-              }
-            />
+              </div>
+            }
+          >
+            {isDocumentLoaded && (
+              <Page
+                pageNumber={pageNumber}
+                scale={scale}
+                loading={
+                  <div className="flex items-center justify-center h-96 bg-white rounded min-w-[400px]">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                }
+                error={
+                  <div className="flex items-center justify-center h-96 bg-white rounded min-w-[400px]">
+                    <div className="text-center text-red-500">
+                      <p>Error al cargar la página</p>
+                    </div>
+                  </div>
+                }
+              />
+            )}
           </Document>
         </div>
       </div>
