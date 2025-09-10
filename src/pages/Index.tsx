@@ -42,43 +42,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gradient">
-                CEDEAR Portfolio Tracker
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Gestiona tu cartera de CEDEARs con precisión profesional
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate('/precios')}
-                className="flex items-center gap-2"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Ver Precios CEDEAR
-              </Button>
-              <Badge variant="outline" className="text-xs">
-                MVP v1.0
-              </Badge>
-              {portfolioSummary && (
-                <Badge className="gradient-primary text-xs">
-                  {portfolioSummary.posiciones.length} posiciones activas
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background p-4">
+      <div className="container mx-auto">
         {/* Price Update Status */}
         <div className="mb-6">
           <PriceUpdateStatus
@@ -239,7 +204,7 @@ const Index = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
+      </div>
     </div>
   );
 };

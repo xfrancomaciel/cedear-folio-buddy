@@ -49,38 +49,17 @@ const CedearPrices = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Volver al Portfolio
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gradient">
-                  Precios CEDEAR en Tiempo Real
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  Precios actualizados automáticamente desde data912.com
-                </p>
-              </div>
-            </div>
-            <Badge variant="outline" className="text-xs">
-              {filteredPrices.length} de {TRACKED_CEDEARS.length} CEDEARs
-            </Badge>
-          </div>
+    <div className="min-h-screen bg-background p-4">
+      <div className="container mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gradient">
+            Precios CEDEAR en Tiempo Real
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Precios actualizados automáticamente desde data912.com
+          </p>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6">
         {/* Price Update Status */}
         <PriceUpdateStatus
           loading={loading}
@@ -236,7 +215,7 @@ const CedearPrices = () => {
             </Card>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
