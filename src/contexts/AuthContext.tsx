@@ -79,35 +79,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData?: { username?: string; full_name?: string }) => {
+    console.log('=== SIGNUP DEBUG START ===');
+    console.log('Email:', email);
+    console.log('Password length:', password.length);
+    console.log('UserData:', userData);
+    console.log('Current origin:', window.location.origin);
+    
     try {
-      console.log('Starting signup process for email:', email);
       const redirectUrl = `${window.location.origin}/auth`;
+      console.log('Redirect URL:', redirectUrl);
       
-      const { data, error } = await supabase.auth.signUp({
+      const signUpData = {
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
           data: userData
         }
-      });
+      };
+      
+      console.log('SignUp request data:', signUpData);
+      
+      const { data, error } = await supabase.auth.signUp(signUpData);
 
-      console.log('Signup response:', { data, error });
+      console.log('=== SUPABASE RESPONSE ===');
+      console.log('Data:', data);
+      console.log('Error:', error);
+      console.log('Error details:', error ? {
+        message: error.message,
+        status: error.status,
+        name: error.name || 'AuthError'
+      } : 'No error');
+      console.log('=== SIGNUP DEBUG END ===');
 
       if (error) {
-        console.error('Signup error:', error);
+        console.error('Signup error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         
         let errorMessage = error.message;
         
         // Handle common Supabase auth errors with friendly Spanish messages
-        if (error.message.includes('Invalid email')) {
-          errorMessage = 'El formato del correo electrónico no es válido. Usa un correo real como ejemplo@gmail.com';
-        } else if (error.message.includes('email address is invalid')) {
-          errorMessage = 'El correo electrónico no es válido. Usa un correo real (ej: ejemplo@gmail.com)';
+        if (error.message.includes('Invalid email') || error.message.includes('email address') && error.message.includes('invalid')) {
+          errorMessage = `El correo "${email}" no es válido según Supabase. Esto puede ser por configuración del servidor. Intenta con otro correo o contacta al administrador.`;
         } else if (error.message.includes('Password')) {
           errorMessage = 'La contraseña debe tener al menos 6 caracteres';
         } else if (error.message.includes('User already registered')) {
           errorMessage = 'Este correo ya está registrado. Intenta iniciar sesión.';
+        } else if (error.message.includes('Signup is disabled')) {
+          errorMessage = 'El registro está deshabilitado. Contacta al administrador.';
         }
         
         toast({
@@ -120,15 +142,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "¡Registro exitoso!",
-        description: "Revisa tu correo para confirmar tu cuenta o inicia sesión directamente."
+        description: data?.user?.email_confirmed_at ? 
+          "Tu cuenta ha sido creada exitosamente." : 
+          "Revisa tu correo para confirmar tu cuenta."
       });
 
       return { error: null };
     } catch (error: any) {
-      console.error('Unexpected signup error:', error);
+      console.error('=== UNEXPECTED SIGNUP ERROR ===');
+      console.error('Error object:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error constructor:', error.constructor.name);
+      
       toast({
         title: "Error inesperado",
-        description: "Ha ocurrido un error durante el registro.",
+        description: `Ha ocurrido un error durante el registro: ${error.message || 'Error desconocido'}`,
         variant: "destructive"
       });
       return { error };
