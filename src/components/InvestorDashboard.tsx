@@ -118,8 +118,8 @@ export function InvestorDashboard() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <div className="h-4 w-4 bg-primary-foreground rounded-br-sm rounded-tr-xs rounded-tl-sm rounded-bl-xs" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-background">
+                  <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">BDI Suite</span>
