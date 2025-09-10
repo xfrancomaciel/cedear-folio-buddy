@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      bond_market_metrics: {
+        Row: {
+          average_convexity: number | null
+          average_duration_years: number | null
+          average_spread_bps: number | null
+          beta_vs_usd: number | null
+          created_at: string
+          id: string
+          last_updated: string
+        }
+        Insert: {
+          average_convexity?: number | null
+          average_duration_years?: number | null
+          average_spread_bps?: number | null
+          beta_vs_usd?: number | null
+          created_at?: string
+          id?: string
+          last_updated?: string
+        }
+        Update: {
+          average_convexity?: number | null
+          average_duration_years?: number | null
+          average_spread_bps?: number | null
+          beta_vs_usd?: number | null
+          created_at?: string
+          id?: string
+          last_updated?: string
+        }
+        Relationships: []
+      }
       cash_flows: {
         Row: {
           amortization: number | null
@@ -153,11 +183,14 @@ export type Database = {
             | Database["public"]["Enums"]["coupon_frequency"]
             | null
           created_at: string
+          currency: string | null
           day_count_basis: Database["public"]["Enums"]["day_count_basis"] | null
+          face_value: number | null
           id: string
           instrument_type: Database["public"]["Enums"]["instrument_type"]
           issuer: Database["public"]["Enums"]["issuer_type"]
           law: Database["public"]["Enums"]["law_type"] | null
+          maturity_date: string | null
           rating: Database["public"]["Enums"]["rating_type"] | null
           ticker: string
           ticker_mep: string | null
@@ -170,13 +203,16 @@ export type Database = {
             | Database["public"]["Enums"]["coupon_frequency"]
             | null
           created_at?: string
+          currency?: string | null
           day_count_basis?:
             | Database["public"]["Enums"]["day_count_basis"]
             | null
+          face_value?: number | null
           id?: string
           instrument_type: Database["public"]["Enums"]["instrument_type"]
           issuer: Database["public"]["Enums"]["issuer_type"]
           law?: Database["public"]["Enums"]["law_type"] | null
+          maturity_date?: string | null
           rating?: Database["public"]["Enums"]["rating_type"] | null
           ticker: string
           ticker_mep?: string | null
@@ -189,13 +225,16 @@ export type Database = {
             | Database["public"]["Enums"]["coupon_frequency"]
             | null
           created_at?: string
+          currency?: string | null
           day_count_basis?:
             | Database["public"]["Enums"]["day_count_basis"]
             | null
+          face_value?: number | null
           id?: string
           instrument_type?: Database["public"]["Enums"]["instrument_type"]
           issuer?: Database["public"]["Enums"]["issuer_type"]
           law?: Database["public"]["Enums"]["law_type"] | null
+          maturity_date?: string | null
           rating?: Database["public"]["Enums"]["rating_type"] | null
           ticker?: string
           ticker_mep?: string | null
@@ -248,7 +287,9 @@ export type Database = {
       prices: {
         Row: {
           close_price: number | null
+          convexity: number | null
           created_at: string
+          duration: number | null
           id: string
           is_stale: boolean | null
           pct_change: number | null
@@ -257,13 +298,17 @@ export type Database = {
           q_ask: number | null
           q_bid: number | null
           q_op: number | null
+          spread_bps: number | null
           symbol: string
           timestamp: string
           volume: number | null
+          yield: number | null
         }
         Insert: {
           close_price?: number | null
+          convexity?: number | null
           created_at?: string
+          duration?: number | null
           id?: string
           is_stale?: boolean | null
           pct_change?: number | null
@@ -272,13 +317,17 @@ export type Database = {
           q_ask?: number | null
           q_bid?: number | null
           q_op?: number | null
+          spread_bps?: number | null
           symbol: string
           timestamp?: string
           volume?: number | null
+          yield?: number | null
         }
         Update: {
           close_price?: number | null
+          convexity?: number | null
           created_at?: string
+          duration?: number | null
           id?: string
           is_stale?: boolean | null
           pct_change?: number | null
@@ -287,9 +336,11 @@ export type Database = {
           q_ask?: number | null
           q_bid?: number | null
           q_op?: number | null
+          spread_bps?: number | null
           symbol?: string
           timestamp?: string
           volume?: number | null
+          yield?: number | null
         }
         Relationships: []
       }
@@ -376,6 +427,26 @@ export type Database = {
       }
     }
     Views: {
+      latest_bond_prices: {
+        Row: {
+          convexity: number | null
+          created_at: string | null
+          duration: number | null
+          id: string | null
+          is_stale: boolean | null
+          last_updated: string | null
+          pct_change: number | null
+          px_ask: number | null
+          px_bid: number | null
+          px_close: number | null
+          px_mid: number | null
+          spread_bps: number | null
+          symbol: string | null
+          volume: number | null
+          yield: number | null
+        }
+        Relationships: []
+      }
       latest_cedear_prices: {
         Row: {
           created_at: string | null

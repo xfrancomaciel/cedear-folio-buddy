@@ -7,6 +7,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { InvestorDashboard } from "@/components/InvestorDashboard";
 import Index from "./pages/Index";
 import CedearPrices from "./pages/CedearPrices";
+import Dashboard from "./pages/Dashboard";
+import BondsAnalytics from "./pages/BondsAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,8 +32,11 @@ const App = () => (
               </header>
               <div className="flex-1 overflow-auto">
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/precios" element={<CedearPrices />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/bonos" element={<BondsAnalytics />} />
+                  <Route path="/acciones" element={<CedearPrices />} />
+                  <Route path="/portfolio" element={<Index />} />
+                  <Route path="/" element={<Dashboard />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -26,33 +26,27 @@ import { Link, useLocation } from "react-router-dom";
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
     tooltip: "Panel principal",
   },
   {
-    title: "Portfolio CEDEAR",
-    url: "/",
+    title: "Bonos",
+    url: "/bonos",
     icon: TrendingUp,
-    tooltip: "Gestión de portfolio",
+    tooltip: "Análisis de bonos",
   },
   {
-    title: "Precios CEDEAR",
-    url: "/precios",
+    title: "Acciones",
+    url: "/acciones",
     icon: DollarSign,
-    tooltip: "Precios en tiempo real",
+    tooltip: "Precios CEDEAR",
   },
   {
-    title: "Análisis",
-    url: "/analisis",
-    icon: BarChart3,
-    tooltip: "Análisis de mercado",
-  },
-  {
-    title: "Mercado",
-    url: "/mercado",
+    title: "Portfolio",
+    url: "/portfolio",
     icon: PieChart,
-    tooltip: "Estado del mercado",
+    tooltip: "Gestión de portfolio",
   },
   {
     title: "Configuración",
