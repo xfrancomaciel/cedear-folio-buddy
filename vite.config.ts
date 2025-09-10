@@ -41,10 +41,10 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['pdfjs-dist']
+    include: ['pdfjs-dist', 'pdfjs-dist/build/pdf.worker.entry']
   },
   assetsInclude: ['**/*.pdf'],
-  worker: {
-    format: 'es'
+  define: {
+    global: 'globalThis',
   },
 }));
