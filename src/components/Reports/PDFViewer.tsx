@@ -5,8 +5,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Configure PDF.js worker - Use CDN for reliability
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Configure PDF.js worker with fallback
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 interface PDFViewerProps {
   pdfUrl: string;
@@ -22,6 +22,9 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, className = '' }) 
 
   useEffect(() => {
     console.log('PDFViewer mounted with URL:', pdfUrl);
+    setLoading(true);
+    setError(null);
+    setPageNumber(1);
   }, [pdfUrl]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -133,9 +136,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, className = '' }) 
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             options={{
-              cMapUrl: `//unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+              cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
               cMapPacked: true,
-              standardFontDataUrl: `//unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+              standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+              verbosity: 0,
             }}
             loading={
               <div className="flex items-center justify-center h-96 bg-white rounded">
