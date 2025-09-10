@@ -43,9 +43,8 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['pdfjs-dist']
   },
-  build: {
-    rollupOptions: {
-      external: id => id.includes('pdf.worker.js')
-    }
+  assetsInclude: ['**/*.pdf'],
+  worker: {
+    format: 'es'
   },
 }));
