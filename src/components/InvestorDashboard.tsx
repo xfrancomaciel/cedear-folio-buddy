@@ -51,12 +51,6 @@ const navigationItems = [
     icon: PieChart,
     tooltip: "Gestión de portfolio",
   },
-  {
-    title: "Configuración",
-    url: "/configuracion",
-    icon: Settings,
-    tooltip: "Configuración de la app",
-  },
 ];
 
 export function InvestorDashboard() {
