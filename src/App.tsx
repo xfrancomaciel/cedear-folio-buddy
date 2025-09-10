@@ -29,32 +29,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/*" element={
               <ProtectedRoute>
-                <SidebarProvider>
-                  <div className="flex min-h-screen w-full">
-                    <InvestorDashboard />
-                    <main className="flex-1">
-                      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                        <SidebarTrigger className="-ml-1" />
-                        <div className="flex items-center gap-2">
-                          <div className="h-5 w-6 bg-primary rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-                          <span className="font-semibold text-foreground">InvestorSuite</span>
-                        </div>
-                      </header>
-                      <div className="flex-1 overflow-auto">
-                        <Routes>
-                          <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/bonos" element={<BondsAnalytics />} />
-                          <Route path="/acciones" element={<CedearPrices />} />
-                          <Route path="/portfolio" element={<Index />} />
-                          <Route path="/configuracion" element={<Settings />} />
-                          <Route path="/" element={<Dashboard />} />
-                          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
-                      </div>
-                    </main>
-                  </div>
-                </SidebarProvider>
+                <AppLayout />
               </ProtectedRoute>
             } />
           </Routes>
@@ -62,6 +37,34 @@ const App = () => (
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
+);
+
+const AppLayout = () => (
+  <SidebarProvider>
+    <div className="flex min-h-screen w-full">
+      <InvestorDashboard />
+      <main className="flex-1">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-6 bg-primary rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+            <span className="font-semibold text-foreground">InvestorSuite</span>
+          </div>
+        </header>
+        <div className="flex-1 overflow-auto">
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/bonos" element={<BondsAnalytics />} />
+            <Route path="/acciones" element={<CedearPrices />} />
+            <Route path="/portfolio" element={<Index />} />
+            <Route path="/configuracion" element={<Settings />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </main>
+    </div>
+  </SidebarProvider>
 );
 
 export default App;
