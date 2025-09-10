@@ -16,6 +16,13 @@ import {
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   LayoutDashboard, 
   TrendingUp, 
@@ -27,7 +34,8 @@ import {
   User,
   Plus,
   History,
-  ChevronRight
+  ChevronRight,
+  MoreHorizontal
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -193,37 +201,51 @@ export function InvestorDashboard() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
-              asChild 
-              tooltip="Ver perfil"
-            >
-              <Link to="/configuracion" className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={profile?.avatar_url} />
-                  <AvatarFallback className="text-xs">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col text-left">
-                  <span className="text-sm font-medium truncate">
-                    {getUserDisplayName()}
-                  </span>
-                  <span className="text-xs text-muted-foreground truncate">
-                    {user?.email}
-                  </span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={handleSignOut}
-              tooltip="Cerrar sesión"
-              className="text-destructive hover:text-destructive"
-            >
-              <LogOut />
-              <span>Cerrar Sesión</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatar_url} />
+                    <AvatarFallback className="text-xs">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {getUserDisplayName()}
+                    </span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user?.email}
+                    </span>
+                  </div>
+                  <MoreHorizontal className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side="bottom"
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuItem asChild>
+                  <Link to="/configuracion" className="flex items-center gap-2">
+                    <User className="size-4" />
+                    <span>Ver perfil</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={handleSignOut}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <LogOut className="size-4" />
+                  <span>Cerrar sesión</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
