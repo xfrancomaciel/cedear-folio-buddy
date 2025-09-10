@@ -164,7 +164,7 @@ export function InvestorDashboard() {
                     >
                       <PieChart />
                       <span>Portfolio</span>
-                      <ChevronRight className="ml-auto transition-transform data-[state=open]:rotate-90" />
+                      <ChevronRight className={`ml-auto transition-transform duration-200 ${isPortfolioOpen ? 'rotate-90' : ''}`} />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
