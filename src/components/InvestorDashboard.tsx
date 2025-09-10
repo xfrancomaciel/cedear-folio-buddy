@@ -233,7 +233,7 @@ export function InvestorDashboard() {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton 
                       tooltip="Gestión de portfolio"
-                      isActive={location.pathname.startsWith('/portfolio')}
+                      isActive={location.pathname === '/portfolio' && !location.hash}
                     >
                       <PieChart />
                       <span>Portfolio</span>
@@ -246,7 +246,9 @@ export function InvestorDashboard() {
                         <SidebarMenuSubItem key={item.title}>
                           <SidebarMenuSubButton 
                             asChild
-                            isActive={location.pathname === item.url || (item.url.includes('#') && location.pathname === '/portfolio')}
+                            isActive={item.url.includes('#') ? 
+                              location.pathname + location.hash === item.url : 
+                              location.pathname === item.url}
                           >
                             <Link to={item.url}>
                               <span>{item.title}</span>
