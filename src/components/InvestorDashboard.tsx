@@ -70,9 +70,10 @@ const navigationItems = [
   },
   {
     title: "Comunidad",
+    url: "https://chat.bdiconsultora.com/",
     icon: Users,
     tooltip: "Comunidad de inversores",
-    comingSoon: true,
+    external: true,
   },
 ];
 
@@ -173,6 +174,16 @@ export function InvestorDashboard() {
                     >
                       <item.icon />
                       <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  ) : item.external ? (
+                    <SidebarMenuButton 
+                      asChild 
+                      tooltip={item.tooltip}
+                    >
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
                     </SidebarMenuButton>
                   ) : (
                     <SidebarMenuButton 
