@@ -23,17 +23,32 @@ import {
   PieChart, 
   BarChart3, 
   Settings, 
-  LogOut,
-  User,
-  Plus,
-  History,
-  ChevronRight,
+import {
+  LayoutDashboard,
+  TrendingUp,
+  DollarSign,
   GraduationCap,
   FileText,
+  Eye,
+  Plus,
+  History,
+  Settings,
+  ChartLine,
+  Map, 
+  Search,
+  BarChart3,
+  Shield,
   Users,
+  ChevronRight,
+  Youtube,
+  MessageCircle,
+  Target,
+  LogOut,
+  User,
   Wrench,
   PlayCircle,
   ExternalLink
+} from "lucide-react";
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,27 +94,38 @@ const navigationItems = [
 const portfolioItems = [
   {
     title: "Ver Portfolio",
-    url: "/portfolio",
-    tooltip: "Vista completa del portfolio",
+    url: "/dashboard",
+    icon: Eye,
+    tooltip: "Vista general del portfolio",
   },
   {
     title: "Agregar",
-    url: "/portfolio#add",
-    tooltip: "Agregar transacciones",
+    url: "/dashboard",
+    icon: Plus,
+    tooltip: "Agregar transacción",
   },
   {
     title: "Ganancias",
-    url: "/portfolio#gains",
+    url: "/dashboard",
+    icon: TrendingUp,
     tooltip: "Ganancias realizadas",
   },
   {
     title: "Historial",
-    url: "/portfolio#history",
+    url: "/dashboard",
+    icon: History,
     tooltip: "Historial de transacciones",
   },
   {
+    title: "Optimizador",
+    url: "/portfolio/optimizador",
+    icon: Target,
+    tooltip: "Optimización de cartera",
+  },
+  {
     title: "Configuración",
-    url: "/portfolio#settings",
+    url: "/configuracion",
+    icon: Settings,
     tooltip: "Configuración del portfolio",
   },
 ];
