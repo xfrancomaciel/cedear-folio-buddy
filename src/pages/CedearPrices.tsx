@@ -71,6 +71,50 @@ const CedearPrices = () => {
           onRefresh={refresh}
         />
 
+        {/* Market Summary Indicators */}
+        {filteredPrices.length > 0 && (
+          <div className={cn(
+            "grid gap-4 mb-6",
+            isMobile ? "grid-cols-3" : "grid-cols-1 md:grid-cols-3"
+          )}>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-green-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="text-sm font-medium">En Alza</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">
+                  {filteredPrices.filter(p => p.pct_change > 0).length}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-red-600">
+                  <TrendingDown className="h-4 w-4" />
+                  <span className="text-sm font-medium">En Baja</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">
+                  {filteredPrices.filter(p => p.pct_change < 0).length}
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Minus className="h-4 w-4" />
+                  <span className="text-sm font-medium">Sin Cambio</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">
+                  {filteredPrices.filter(p => p.pct_change === 0).length}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Search and Controls */}
         <Card>
           <CardHeader className="pb-3">
@@ -178,50 +222,6 @@ const CedearPrices = () => {
             )}
           </CardContent>
         </Card>
-
-        {/* Summary Stats */}
-        {filteredPrices.length > 0 && (
-          <div className={cn(
-            "grid gap-4",
-            isMobile ? "grid-cols-3" : "grid-cols-1 md:grid-cols-3"
-          )}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-green-600">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-sm font-medium">En Alza</span>
-                </div>
-                <p className="text-2xl font-bold mt-2">
-                  {filteredPrices.filter(p => p.pct_change > 0).length}
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-red-600">
-                  <TrendingDown className="h-4 w-4" />
-                  <span className="text-sm font-medium">En Baja</span>
-                </div>
-                <p className="text-2xl font-bold mt-2">
-                  {filteredPrices.filter(p => p.pct_change < 0).length}
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Minus className="h-4 w-4" />
-                  <span className="text-sm font-medium">Sin Cambio</span>
-                </div>
-                <p className="text-2xl font-bold mt-2">
-                  {filteredPrices.filter(p => p.pct_change === 0).length}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );
