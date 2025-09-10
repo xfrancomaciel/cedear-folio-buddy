@@ -37,8 +37,10 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DollarRates } from "@/components/DollarRates";
+import { AdminPanel } from "@/components/AdminPanel/AdminPanel";
 import { toast } from "sonner";
 
 const navigationItems = [
@@ -128,11 +130,15 @@ const herramientasItems = [
 export function InvestorDashboard() {
   const location = useLocation();
   const { user, profile } = useAuth();
+  const { isAdmin } = useUserRole();
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(
     location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
   );
   const [isHerramientasOpen, setIsHerramientasOpen] = useState(
     location.pathname.startsWith('/herramientas')
+  );
+  const [isAdminOpen, setIsAdminOpen] = useState(
+    location.pathname.startsWith('/admin')
   );
   
   
@@ -285,6 +291,14 @@ export function InvestorDashboard() {
       
       <SidebarFooter>
         <SidebarMenu>
+          {/* Admin Panel - Only for admin users */}
+          {isAdmin && (
+            <AdminPanel 
+              isOpen={isAdminOpen} 
+              onToggle={setIsAdminOpen} 
+            />
+          )}
+          
           <SidebarMenuItem>
             <SidebarMenuButton 
               asChild 

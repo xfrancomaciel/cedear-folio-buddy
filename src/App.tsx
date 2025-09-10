@@ -23,6 +23,7 @@ import Mapa from "./pages/Mapa";
 import Screener from "./pages/Screener";
 import Analizador from "./pages/Analizador";
 import YouTube from "./pages/YouTube";
+import AdminUsers from "./pages/AdminUsers";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -103,6 +104,16 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <YouTube />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <AdminUsers />
                 </AppLayout>
               </ProtectedRoute>
             }
