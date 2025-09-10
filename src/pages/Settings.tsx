@@ -6,13 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Loader2, Save, User, Mail, Calendar } from 'lucide-react';
+import { Camera, Loader2, Save, User, Mail, Calendar, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function Settings() {
-  const { user, profile, updateProfile, uploadAvatar } = useAuth();
+  const { user, profile, updateProfile, uploadAvatar, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,6 +80,10 @@ export default function Settings() {
   const hasChanges = 
     username !== (profile?.username || '') || 
     fullName !== (profile?.full_name || '');
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -291,6 +295,37 @@ export default function Settings() {
                   Próximamente
                 </Button>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Logout Section */}
+        <Card className="border-destructive/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <LogOut className="h-5 w-5" />
+              Cerrar Sesión
+            </CardTitle>
+            <CardDescription>
+              Cierra tu sesión actual en la aplicación
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Salir de la aplicación</p>
+                <p className="text-sm text-muted-foreground">
+                  Se cerrará tu sesión y tendrás que volver a iniciar sesión
+                </p>
+              </div>
+              <Button 
+                variant="destructive" 
+                onClick={handleSignOut}
+                className="ml-4"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Cerrar Sesión
+              </Button>
             </div>
           </CardContent>
         </Card>
