@@ -72,7 +72,7 @@ const navigationItems = [
   },
   {
     title: "Comunidad",
-    url: "https://chat.bdiconsultora.com/",
+    url: "https://chat.bdiconsultora.com/signup_user_complete/?id=7z8bfgqz9j8nbbf7z78n6q6opw&md=link&sbr=fa",
     icon: Users,
     tooltip: "Comunidad de inversores",
     external: true,
