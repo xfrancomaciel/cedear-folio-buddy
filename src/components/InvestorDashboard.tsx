@@ -122,6 +122,11 @@ const herramientasItems = [
     url: "/herramientas/screener",
     tooltip: "Screener de acciones",
   },
+  {
+    title: "Analizador",
+    url: "/herramientas/analizador",
+    tooltip: "Análisis completo de acciones",
+  },
 ];
 
 export function InvestorDashboard() {
