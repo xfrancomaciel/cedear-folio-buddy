@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InvestorDashboard } from "@/components/InvestorDashboard";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import TradingViewTickerTape from "@/components/TradingView/TradingViewTickerTape";
 import Index from "./pages/Index";
 import CedearPrices from "./pages/CedearPrices";
 import Dashboard from "./pages/Dashboard";
@@ -131,7 +132,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <SidebarProvider>
     <div className="flex min-h-screen w-full">
       <InvestorDashboard />
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
+        <div className="sticky top-0 z-50 bg-background border-b">
+          <TradingViewTickerTape />
+        </div>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="flex items-center gap-2">
@@ -151,7 +155,10 @@ const GraficadorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   <SidebarProvider>
     <div className="flex min-h-screen w-full">
       <InvestorDashboard />
-      <main className="flex-1 h-screen">
+      <main className="flex-1 h-screen flex flex-col">
+        <div className="sticky top-0 z-50 bg-background border-b">
+          <TradingViewTickerTape />
+        </div>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="flex items-center gap-2">
@@ -159,7 +166,7 @@ const GraficadorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
             <span className="font-semibold text-foreground">Graficador TradingView</span>
           </div>
         </header>
-        <div className="h-[calc(100vh-4rem)] w-full">
+        <div className="h-[calc(100vh-7rem)] w-full">
           {children}
         </div>
       </main>
