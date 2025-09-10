@@ -32,7 +32,8 @@ import {
   FileText,
   Users,
   Wrench,
-  PlayCircle
+  PlayCircle,
+  ExternalLink
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -218,6 +219,7 @@ export function InvestorDashboard() {
                       <a href={item.url} target="_blank" rel="noopener noreferrer">
                         <item.icon />
                         <span>{item.title}</span>
+                        <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
                       </a>
                     </SidebarMenuButton>
                   ) : (
