@@ -112,6 +112,11 @@ const herramientasItems = [
     url: "/herramientas/graficador",
     tooltip: "Gráficos avanzados TradingView",
   },
+  {
+    title: "Mapa",
+    url: "/herramientas/mapa",
+    tooltip: "Mapa de calor de acciones",
+  },
 ];
 
 export function InvestorDashboard() {
