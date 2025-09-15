@@ -36,8 +36,7 @@ const CedearPrices = () => {
     hasActiveFilters,
     priceRange,
     volumeRange,
-    refresh,
-    getSectorForSymbol
+    refresh
   } = useEnhancedCedearPrices();
 
   const { sectorGroups, getSymbolsBySector, getPopularSymbols } = useCedearSectors();

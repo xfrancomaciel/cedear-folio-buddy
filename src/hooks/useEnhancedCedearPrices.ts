@@ -13,6 +13,7 @@ interface EnhancedCedearPrice {
   volume: number;
   pct_change: number;
   last_updated: string;
+  created_at?: string;
 }
 
 export function useEnhancedCedearPrices() {
@@ -21,37 +22,48 @@ export function useEnhancedCedearPrices() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const { sectors, getPopularSymbols, getSectorForSymbol } = useCedearSectors();
+  const { sectors, getPopularSymbols } = useCedearSectors();
   const { filters, updateFilter, resetFilters, hasActiveFilters } = useCedearFilters();
+
+  const mapRow = (item: any): EnhancedCedearPrice => ({
+    id: item.id || `${item.symbol}-${item.created_at || item.last_updated || Date.now()}`,
+    symbol: (item.symbol || '').toUpperCase(),
+    px_bid: Number(item.px_bid || 0),
+    px_ask: Number(item.px_ask || 0),
+    px_mid: Number(item.px_mid ?? ((item.px_bid && item.px_ask) ? (Number(item.px_bid) + Number(item.px_ask)) / 2 : (item.px_close || 0))),
+    px_close: Number(item.px_close || item.close_price || 0),
+    volume: Number(item.volume || item.v || 0),
+    pct_change: Number(item.pct_change || 0),
+    last_updated: item.last_updated || item.timestamp || item.created_at || new Date().toISOString(),
+    created_at: item.created_at
+  });
 
   const fetchPrices = useCallback(async () => {
     try {
       setError(null);
 
+      // Fetch latest rows from raw table to avoid view limitations
       const { data, error: fetchError } = await supabase
-        .from('latest_cedear_prices')
+        .from('cedear_prices')
         .select('*')
-        .order('volume', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(5000);
 
-      if (fetchError) {
-        throw fetchError;
-      }
+      if (fetchError) throw fetchError;
 
-      const prices: EnhancedCedearPrice[] = (data || []).map(item => ({
-        id: item.id || '',
-        symbol: item.symbol || '',
-        px_bid: item.px_bid || 0,
-        px_ask: item.px_ask || 0,
-        px_mid: item.px_mid || 0,
-        px_close: item.px_close || 0,
-        volume: item.volume || 0,
-        pct_change: item.pct_change || 0,
-        last_updated: item.last_updated || new Date().toISOString()
-      }));
+      // Deduplicate by symbol keeping the most recent
+      const dedupedMap: Record<string, EnhancedCedearPrice> = {};
+      (data || []).forEach((row: any) => {
+        const mapped = mapRow(row);
+        if (!dedupedMap[mapped.symbol]) {
+          dedupedMap[mapped.symbol] = mapped;
+        }
+      });
 
-      setAllPrices(prices);
+      const deduped = Object.values(dedupedMap);
+
+      setAllPrices(deduped.sort((a, b) => b.volume - a.volume));
       setLastUpdated(new Date());
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error fetching prices';
       setError(errorMessage);
@@ -61,29 +73,31 @@ export function useEnhancedCedearPrices() {
     }
   }, []);
 
-  const refresh = useCallback(() => {
+  const triggerEdgeUpdate = useCallback(async () => {
+    try {
+      await supabase.functions.invoke('update-cedear-prices');
+    } catch (e) {
+      console.warn('Edge update invocation failed:', e);
+    }
+  }, []);
+
+  const refresh = useCallback(async () => {
     setLoading(true);
-    fetchPrices();
-  }, [fetchPrices]);
+    await triggerEdgeUpdate();
+    await fetchPrices();
+  }, [fetchPrices, triggerEdgeUpdate]);
 
   // Create sector mapping for filtering
   const sectorMap = useMemo(() => {
     const map: Record<string, string> = {};
-    sectors.forEach(s => {
-      map[s.symbol] = s.sector;
-    });
+    sectors.forEach(s => { map[s.symbol] = s.sector; });
     return map;
   }, [sectors]);
 
   // Create company name mapping
   const companyMap = useMemo(() => {
     const map: Record<string, { sector: string; company_name?: string }> = {};
-    sectors.forEach(s => {
-      map[s.symbol] = {
-        sector: s.sector,
-        company_name: s.company_name
-      };
-    });
+    sectors.forEach(s => { map[s.symbol] = { sector: s.sector, company_name: s.company_name }; });
     return map;
   }, [sectors]);
 
@@ -95,23 +109,17 @@ export function useEnhancedCedearPrices() {
     return filterCedearPrices(allPrices, filters, sectorMap, popularSymbols);
   }, [allPrices, filters, sectorMap, popularSymbols]);
 
-  // Calculate price and volume ranges for filter UI
+  // Calculate ranges for filter UI
   const priceRange = useMemo(() => {
     if (allPrices.length === 0) return { min: 0, max: 100000 };
     const prices = allPrices.map(p => p.px_close).filter(p => p > 0);
-    return {
-      min: Math.min(...prices),
-      max: Math.max(...prices)
-    };
+    return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [allPrices]);
 
   const volumeRange = useMemo(() => {
     if (allPrices.length === 0) return { min: 0, max: 1000000 };
     const volumes = allPrices.map(p => p.volume).filter(v => v > 0);
-    return {
-      min: Math.min(...volumes),
-      max: Math.max(...volumes)
-    };
+    return { min: Math.min(...volumes), max: Math.max(...volumes) };
   }, [allPrices]);
 
   // Market summary stats
@@ -120,61 +128,47 @@ export function useEnhancedCedearPrices() {
     const up = filteredPrices.filter(p => p.pct_change > 0).length;
     const down = filteredPrices.filter(p => p.pct_change < 0).length;
     const unchanged = filteredPrices.filter(p => p.pct_change === 0).length;
-
     return { total, up, down, unchanged };
   }, [filteredPrices]);
 
   useEffect(() => {
-    // Initial fetch
-    fetchPrices();
+    // Kick off an update in the background and fetch
+    (async () => {
+      try { await triggerEdgeUpdate(); } catch {}
+      await fetchPrices();
+    })();
 
     // Subscribe to real-time changes
     const subscription = supabase
       .channel('enhanced_cedear_prices_channel')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'cedear_prices' },
-        () => {
-          console.log('New CEDEAR price data available, refreshing...');
-          fetchPrices();
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cedear_prices' }, () => {
+        fetchPrices();
+      })
       .subscribe();
 
-    // Refresh every 2 minutes as fallback
+    // Fallback periodic refresh
     const refreshInterval = setInterval(fetchPrices, 120000);
 
     return () => {
       subscription.unsubscribe();
       clearInterval(refreshInterval);
     };
-  }, [fetchPrices]);
+  }, [fetchPrices, triggerEdgeUpdate]);
 
   return {
-    // Data
     allPrices,
     filteredPrices,
     sectors: companyMap,
     marketStats,
-    
-    // State
     loading,
     error,
     lastUpdated,
-    
-    // Filters
     filters,
     updateFilter,
     resetFilters,
     hasActiveFilters,
-    
-    // Ranges for filter UI
     priceRange,
     volumeRange,
-    
-    // Actions
-    refresh,
-    
-    // Helpers
-    getSectorForSymbol
+    refresh
   };
 }
