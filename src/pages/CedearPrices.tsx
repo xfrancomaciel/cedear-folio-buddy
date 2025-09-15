@@ -92,7 +92,7 @@ const CedearPrices = () => {
                   CEDEARs en Tiempo Real
                 </h1>
                 <p className={cn("text-muted-foreground mt-1", isMobile ? "text-base" : "text-sm")}>
-                  {allPrices.length} CEDEARs disponibles • Datos desde data912.com
+                  Seguimiento en tiempo real de CEDEARs
                 </p>
               </div>
               <div className="flex items-center gap-2">

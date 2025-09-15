@@ -195,31 +195,6 @@ export function InvestorDashboard() {
           <SidebarGroupLabel>Aplicaciones</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  {'comingSoon' in item && item.comingSoon ? (
-                    <SidebarMenuButton 
-                      tooltip={item.tooltip}
-                      onClick={() => handleComingSoon(item.title)}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  ) : (
-                    <SidebarMenuButton 
-                      asChild 
-                      tooltip={item.tooltip}
-                      isActive={location.pathname === item.url}
-                    >
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )}
-                </SidebarMenuItem>
-              ))}
-              
               {/* Portfolio Collapsible Section */}
               <Collapsible open={isPortfolioOpen} onOpenChange={setIsPortfolioOpen}>
                 <SidebarMenuItem>
@@ -254,6 +229,31 @@ export function InvestorDashboard() {
                 </SidebarMenuItem>
               </Collapsible>
 
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  {'comingSoon' in item && item.comingSoon ? (
+                    <SidebarMenuButton 
+                      tooltip={item.tooltip}
+                      onClick={() => handleComingSoon(item.title)}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton 
+                      asChild 
+                      tooltip={item.tooltip}
+                      isActive={location.pathname === item.url}
+                    >
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
+                </SidebarMenuItem>
+              ))}
+              
               {/* Herramientas Collapsible Section */}
               <Collapsible open={isHerramientasOpen} onOpenChange={setIsHerramientasOpen}>
                 <SidebarMenuItem>
