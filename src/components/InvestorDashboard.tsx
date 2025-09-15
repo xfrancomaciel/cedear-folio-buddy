@@ -121,9 +121,9 @@ const herramientasItems = [
     tooltip: "Screener de acciones",
   },
   {
-    title: "Analizador",
-    url: "/herramientas/analizador",
-    tooltip: "Análisis completo de acciones",
+    title: "Calculadora de Retiro",
+    url: "/herramientas/calculadora-retiro",
+    tooltip: "Calculadora de jubilación e inversión",
   },
 ];
 

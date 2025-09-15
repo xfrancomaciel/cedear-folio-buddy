@@ -20,7 +20,7 @@ import Formaciones from "./pages/Formaciones";
 import Graficador from "./pages/Graficador";
 import Mapa from "./pages/Mapa";
 import Screener from "./pages/Screener";
-import Analizador from "./pages/Analizador";
+import CalculadoraRetiro from "./pages/CalculadoraRetiro";
 import YouTube from "./pages/YouTube";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReports from "./pages/AdminReports";
@@ -162,12 +162,12 @@ const App = () => (
             }
           />
           <Route
-            path="/herramientas/analizador"
+            path="/herramientas/calculadora-retiro"
             element={
               <ProtectedRoute>
-                <AnalizadorLayout>
-                  <Analizador />
-                </AnalizadorLayout>
+                <CalculadoraRetiroLayout>
+                  <CalculadoraRetiro />
+                </CalculadoraRetiroLayout>
               </ProtectedRoute>
             }
           />
@@ -288,11 +288,11 @@ const ScreenerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
   </SidebarProvider>
 );
 
-const AnalizadorLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const CalculadoraRetiroLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <SidebarProvider>
     <div className="flex min-h-screen w-full">
       <InvestorDashboard />
-      <main className="flex-1 h-screen flex flex-col">
+      <main className="flex-1 flex flex-col">
         <div className="sticky top-0 z-50 bg-background border-b">
           <TradingViewTickerTape />
         </div>
@@ -300,10 +300,10 @@ const AnalizadorLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           <SidebarTrigger className="-ml-1" />
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
-            <span className="font-semibold text-foreground">Analizador de Acciones</span>
+            <span className="font-semibold text-foreground">Calculadora de Retiro</span>
           </div>
         </header>
-        <div className="h-[calc(100vh-7rem)] w-full overflow-auto">
+        <div className="flex-1 overflow-auto">
           {children}
         </div>
       </main>
