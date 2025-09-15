@@ -123,61 +123,61 @@ const CalculadoraRetiro = () => {
 
       {/* Results Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/50">
+        <Card className="border-red-500/30 bg-red-500/10 dark:border-red-500/50 dark:bg-red-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2 text-red-700 dark:text-red-300">
+            <CardTitle className="text-lg flex items-center gap-2 text-red-800 dark:text-red-100">
               <TrendingDown className="h-5 w-5" />
               Solo Ahorrando
             </CardTitle>
-            <CardDescription className="text-red-600/80 dark:text-red-400/80 font-medium">
+            <CardDescription className="text-red-700 dark:text-red-200 font-medium">
               Sin inversión, solo acumulando dinero
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-700 dark:text-red-300">
+            <div className="text-2xl font-bold text-red-800 dark:text-red-100">
               {formatCurrency(results.savingsWithoutInterest)}
             </div>
-            <p className="text-sm text-red-600/70 dark:text-red-400/70 mt-1 font-medium">
+            <p className="text-sm text-red-700 dark:text-red-200 mt-1 font-medium">
               Capital + aportes mensuales
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/50">
+        <Card className="border-green-500/30 bg-green-500/10 dark:border-green-500/50 dark:bg-green-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2 text-green-700 dark:text-green-300">
+            <CardTitle className="text-lg flex items-center gap-2 text-green-800 dark:text-green-100">
               <TrendingUp className="h-5 w-5" />
               Invirtiendo en SPY
             </CardTitle>
-            <CardDescription className="text-green-600/80 dark:text-green-400/80 font-medium">
+            <CardDescription className="text-green-700 dark:text-green-200 font-medium">
               Con interés compuesto al {formatPercentage(inputs.annualReturn)}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+            <div className="text-2xl font-bold text-green-800 dark:text-green-100">
               {formatCurrency(results.savingsWithInvestment)}
             </div>
-            <p className="text-sm text-green-600/70 dark:text-green-400/70 mt-1 font-medium">
+            <p className="text-sm text-green-700 dark:text-green-200 mt-1 font-medium">
               Capital + interés compuesto
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/50">
+        <Card className="border-blue-500/30 bg-blue-500/10 dark:border-blue-500/50 dark:bg-blue-500/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-300">
+            <CardTitle className="text-lg flex items-center gap-2 text-blue-800 dark:text-blue-100">
               <DollarSign className="h-5 w-5" />
               Diferencia
             </CardTitle>
-            <CardDescription className="text-blue-600/80 dark:text-blue-400/80 font-medium">
+            <CardDescription className="text-blue-700 dark:text-blue-200 font-medium">
               Ganancia por invertir vs solo ahorrar
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+            <div className="text-2xl font-bold text-blue-800 dark:text-blue-100">
               {formatCurrency(results.difference)}
             </div>
-            <p className="text-sm text-blue-600/70 dark:text-blue-400/70 mt-1 font-medium">
+            <p className="text-sm text-blue-700 dark:text-blue-200 mt-1 font-medium">
               {((results.difference / results.savingsWithoutInterest) * 100).toFixed(1)}% más dinero
             </p>
           </CardContent>
