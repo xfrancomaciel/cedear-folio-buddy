@@ -58,16 +58,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
           style={{ backgroundImage: `url(${coverImageUrl})` }}
         >
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
-          <div className="absolute top-2 right-2 flex gap-1">
-            <Badge variant={statusColor} className="text-xs">
-              {report.status === "published" ? "Publicado" : "Borrador"}
-            </Badge>
-          </div>
-          <div className="absolute bottom-2 left-2">
-            <Badge variant="outline" className="bg-white/90 text-xs">
-              {report.category}
-            </Badge>
-          </div>
         </div>
       </div>
 
