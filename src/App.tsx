@@ -13,8 +13,6 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import TradingViewTickerTape from "@/components/TradingView/TradingViewTickerTape";
 import Index from "./pages/Index";
 import CedearPrices from "./pages/CedearPrices";
-import Dashboard from "./pages/Dashboard";
-import BondsAnalytics from "./pages/BondsAnalytics";
 import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Formaciones from "./pages/Formaciones";
@@ -40,23 +38,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout><Dashboard /></AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/bonos" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout><BondsAnalytics /></AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
+            <Route
               path="/acciones" 
               element={
                 <ProtectedRoute>
@@ -184,7 +166,7 @@ const App = () => (
               path="/" 
               element={
                 <ProtectedRoute>
-                  <AppLayout><Dashboard /></AppLayout>
+                  <AppLayout><Index /></AppLayout>
                 </ProtectedRoute>
               } 
             />

@@ -53,18 +53,6 @@ import { toast } from "sonner";
 
 const navigationItems = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-    tooltip: "Panel principal",
-  },
-  {
-    title: "Bonos",
-    url: "/bonos",
-    icon: TrendingUp,
-    tooltip: "Análisis de bonos",
-  },
-  {
     title: "CEDEARs",
     url: "/acciones",
     icon: DollarSign,
@@ -87,25 +75,25 @@ const navigationItems = [
 const portfolioItems = [
   {
     title: "Ver Portfolio",
-    url: "/dashboard",
+    url: "/portfolio",
     icon: Eye,
     tooltip: "Vista general del portfolio",
   },
   {
     title: "Agregar",
-    url: "/dashboard",
+    url: "/portfolio",
     icon: Plus,
     tooltip: "Agregar transacción",
   },
   {
     title: "Ganancias",
-    url: "/dashboard",
+    url: "/portfolio",
     icon: TrendingUp,
     tooltip: "Ganancias realizadas",
   },
   {
     title: "Historial",
-    url: "/dashboard",
+    url: "/portfolio",
     icon: History,
     tooltip: "Historial de transacciones",
   },
@@ -194,7 +182,7 @@ export function InvestorDashboard() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to="/portfolio">
                 <div className="flex aspect-square size-8 items-center justify-center">
                   <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
                 </div>
