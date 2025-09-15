@@ -63,6 +63,12 @@ const navigationItems = [
     icon: DollarSign,
     tooltip: "Precios CEDEAR",
   },
+  {
+    title: "Calculadora de Retiro",
+    url: "/calculadora-retiro",
+    icon: Target,
+    tooltip: "Calculadora de jubilación e inversión",
+  },
 ];
 
 const portfolioItems = [
@@ -119,11 +125,6 @@ const herramientasItems = [
     title: "Screener",
     url: "/herramientas/screener",
     tooltip: "Screener de acciones",
-  },
-  {
-    title: "Calculadora de Retiro",
-    url: "/herramientas/calculadora-retiro",
-    tooltip: "Calculadora de jubilación e inversión",
   },
 ];
 

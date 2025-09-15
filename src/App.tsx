@@ -162,12 +162,12 @@ const App = () => (
             }
           />
           <Route
-            path="/herramientas/calculadora-retiro"
+            path="/calculadora-retiro"
             element={
               <ProtectedRoute>
-                <CalculadoraRetiroLayout>
+                <AppLayout>
                   <CalculadoraRetiro />
-                </CalculadoraRetiroLayout>
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -288,27 +288,5 @@ const ScreenerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
   </SidebarProvider>
 );
 
-const CalculadoraRetiroLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <SidebarProvider>
-    <div className="flex min-h-screen w-full">
-      <InvestorDashboard />
-      <main className="flex-1 flex flex-col">
-        <div className="sticky top-0 z-50 bg-background border-b">
-          <TradingViewTickerTape />
-        </div>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/2d8b7a93-0b3f-463a-a0eb-d828b39eff2b.png" alt="BDI Suite" className="h-6 w-6 object-contain" />
-            <span className="font-semibold text-foreground">Calculadora de Retiro</span>
-          </div>
-        </header>
-        <div className="flex-1 overflow-auto">
-          {children}
-        </div>
-      </main>
-    </div>
-  </SidebarProvider>
-);
 
 export default App;

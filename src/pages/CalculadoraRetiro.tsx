@@ -129,13 +129,15 @@ const CalculadoraRetiro = () => {
               <TrendingDown className="h-5 w-5" />
               Solo Ahorrando
             </CardTitle>
-            <CardDescription>Sin inversión, solo acumulando dinero</CardDescription>
+            <CardDescription className="text-red-600/80 dark:text-red-400/80 font-medium">
+              Sin inversión, solo acumulando dinero
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-700 dark:text-red-300">
               {formatCurrency(results.savingsWithoutInterest)}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-red-600/70 dark:text-red-400/70 mt-1 font-medium">
               Capital + aportes mensuales
             </p>
           </CardContent>
@@ -147,13 +149,15 @@ const CalculadoraRetiro = () => {
               <TrendingUp className="h-5 w-5" />
               Invirtiendo en SPY
             </CardTitle>
-            <CardDescription>Con interés compuesto al {formatPercentage(inputs.annualReturn)}</CardDescription>
+            <CardDescription className="text-green-600/80 dark:text-green-400/80 font-medium">
+              Con interés compuesto al {formatPercentage(inputs.annualReturn)}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-700 dark:text-green-300">
               {formatCurrency(results.savingsWithInvestment)}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-green-600/70 dark:text-green-400/70 mt-1 font-medium">
               Capital + interés compuesto
             </p>
           </CardContent>
@@ -165,13 +169,15 @@ const CalculadoraRetiro = () => {
               <DollarSign className="h-5 w-5" />
               Diferencia
             </CardTitle>
-            <CardDescription>Ganancia por invertir vs solo ahorrar</CardDescription>
+            <CardDescription className="text-blue-600/80 dark:text-blue-400/80 font-medium">
+              Ganancia por invertir vs solo ahorrar
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
               {formatCurrency(results.difference)}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-blue-600/70 dark:text-blue-400/70 mt-1 font-medium">
               {((results.difference / results.savingsWithoutInterest) * 100).toFixed(1)}% más dinero
             </p>
           </CardContent>
