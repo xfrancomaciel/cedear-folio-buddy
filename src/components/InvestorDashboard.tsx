@@ -31,7 +31,6 @@ import {
   Search,
   BarChart3,
   Shield,
-  Users,
   ChevronRight,
   Youtube,
   MessageCircle,
@@ -53,28 +52,16 @@ import { toast } from "sonner";
 
 const navigationItems = [
   {
-    title: "CEDEARs",
-    url: "/acciones",
-    icon: DollarSign,
-    tooltip: "Precios CEDEAR",
-  },
-  {
-    title: "Curso inicial completo",
-    url: "/curso-inicial",
-    icon: PlayCircle,
-    tooltip: "Curso completo para principiantes",
-  },
-  {
-    title: "Formaciones",
-    url: "/formaciones",
-    icon: GraduationCap,
-    tooltip: "Cursos y formación",
-  },
-  {
     title: "Reportes",
     url: "/reportes",
     icon: FileText,
     tooltip: "Reportes y análisis",
+  },
+  {
+    title: "CEDEARs",
+    url: "/acciones",
+    icon: DollarSign,
+    tooltip: "Precios CEDEAR",
   },
 ];
 
@@ -315,11 +302,23 @@ export function InvestorDashboard() {
           <SidebarMenuItem>
             <SidebarMenuButton 
               asChild 
+              tooltip="Curso completo para principiantes"
+              isActive={location.pathname === '/curso-inicial'}
+            >
+              <Link to="/curso-inicial">
+                <PlayCircle />
+                <span>Curso inicial completo</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              asChild 
               tooltip="Canal de YouTube oficial"
               isActive={location.pathname === '/youtube'}
             >
               <Link to="/youtube">
-                <PlayCircle />
+                <Youtube />
                 <span>YouTube</span>
               </Link>
             </SidebarMenuButton>
@@ -327,11 +326,11 @@ export function InvestorDashboard() {
           <SidebarMenuItem>
             <SidebarMenuButton 
               asChild 
-              tooltip="Comunidad de inversores"
+              tooltip="Cursos y formación"
             >
-              <a href="https://chat.bdiconsultora.com/signup_user_complete/?id=7z8bfgqz9j8nbbf7z78n6q6opw&md=link&sbr=fa" target="_blank" rel="noopener noreferrer">
-                <Users />
-                <span>Comunidad</span>
+              <a href="https://bdi-consultora1.tiendup.com/c/membresiasbdi" target="_blank" rel="noopener noreferrer">
+                <GraduationCap />
+                <span>Formaciones</span>
                 <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
               </a>
             </SidebarMenuButton>
