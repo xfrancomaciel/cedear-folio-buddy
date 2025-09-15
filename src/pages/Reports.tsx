@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ReportCard } from "@/components/Reports/ReportCard";
-import { PDFPreview } from "@/components/Reports/PDFPreview";
+
 import { Plus, Search, Filter, Download, Menu } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -18,7 +18,7 @@ const Reports = () => {
   const { isAdmin } = useUserRole();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todos");
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  
 
   // Load reports based on user role
   React.useEffect(() => {
@@ -114,7 +114,7 @@ const Reports = () => {
               date: new Date(report.created_at).toISOString().split('T')[0],
               category: report.category?.name || "Sin categoría"
             }}
-            onPreview={() => setSelectedReport(report)}
+            
           />
         ))}
       </div>
@@ -132,19 +132,6 @@ const Reports = () => {
         </Card>
       )}
 
-      {/* PDF Preview Modal */}
-      {selectedReport && (
-        <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
-          <DialogContent className="max-w-4xl h-[80vh]">
-            <PDFPreview report={{
-              ...selectedReport,
-              pdfUrl: selectedReport.pdf_url || "",
-              coverImage: selectedReport.cover_image_url || "",
-              category: selectedReport.category?.name || "Sin categoría"
-            }} />
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };

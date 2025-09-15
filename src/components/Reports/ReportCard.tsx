@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, Download, Edit3, Calendar, Save, X } from "lucide-react";
+import { Download, Edit3, Calendar, Save, X } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -24,10 +24,9 @@ interface Report {
 
 interface ReportCardProps {
   report: Report;
-  onPreview: () => void;
 }
 
-export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => {
+export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(report.title);
   const [editedDescription, setEditedDescription] = useState(report.description || "");
@@ -55,7 +54,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => 
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
       <div className="relative">
         <div 
-          className="h-48 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+          className="h-64 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
           style={{ backgroundImage: `url(${coverImageUrl})` }}
         >
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
@@ -143,19 +142,22 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report, onPreview }) => 
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            size="sm" 
-            onClick={onPreview}
-            className="flex-1 text-xs h-8"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            Preview
-          </Button>
-          <Button 
-            variant="outline" 
             size="sm"
-            className="h-8 w-8 p-0"
+            className="flex-1 text-xs h-8"
+            onClick={() => {
+              const pdfUrl = report.pdf_url || report.pdfUrl;
+              if (pdfUrl) {
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.download = `${report.title}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }
+            }}
           >
-            <Download className="h-3 w-3" />
+            <Download className="h-3 w-3 mr-1" />
+            Descargar
           </Button>
         </div>
       </CardContent>
