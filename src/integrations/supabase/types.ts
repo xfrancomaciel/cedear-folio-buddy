@@ -82,6 +82,60 @@ export type Database = {
           },
         ]
       }
+      cedear_metadata: {
+        Row: {
+          company_name: string
+          created_at: string
+          currency: string | null
+          description: string | null
+          exchange: string | null
+          exclusion_reason: string | null
+          id: string
+          is_excluded: boolean | null
+          logo_url: string | null
+          min_price_threshold: number | null
+          min_volume_threshold: number | null
+          ratio: number | null
+          symbol: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          exchange?: string | null
+          exclusion_reason?: string | null
+          id?: string
+          is_excluded?: boolean | null
+          logo_url?: string | null
+          min_price_threshold?: number | null
+          min_volume_threshold?: number | null
+          ratio?: number | null
+          symbol: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          exchange?: string | null
+          exclusion_reason?: string | null
+          id?: string
+          is_excluded?: boolean | null
+          logo_url?: string | null
+          min_price_threshold?: number | null
+          min_volume_threshold?: number | null
+          ratio?: number | null
+          symbol?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       cedear_prices: {
         Row: {
           created_at: string | null
@@ -121,6 +175,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cedear_sectors: {
+        Row: {
+          company_name: string | null
+          country: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          is_popular: boolean | null
+          market_cap_category: string | null
+          sector: string
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          is_popular?: boolean | null
+          market_cap_category?: string | null
+          sector: string
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          is_popular?: boolean | null
+          market_cap_category?: string | null
+          sector?: string
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       current_prices: {
         Row: {
           precio_ars: number
@@ -139,6 +232,36 @@ export type Database = {
           ticker?: string
           updated_at?: string
           usd_rate?: number
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          feature_key: string
+          feature_name: string
+          id: string
+          is_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          feature_key: string
+          feature_name: string
+          id?: string
+          is_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          feature_key?: string
+          feature_name?: string
+          id?: string
+          is_enabled?: boolean
+          updated_at?: string
         }
         Relationships: []
       }

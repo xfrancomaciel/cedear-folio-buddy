@@ -41,22 +41,32 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // List of CEDEARs to track
-    const TRACKED_CEDEARS = [
-      'AAPL', 'NVDA', 'TSLA', 'GOOGL', 'MSFT', 'AMZN', 'META', 'NFLX',
-      'DIS', 'BABA', 'GOLD', 'KO', 'PFE', 'XOM', 'JPM', 'V', 'JNJ',
-      'WMT', 'PG', 'HD', 'UNH', 'MA', 'BAC', 'ABBV', 'LLY', 'AVGO',
-      'COST', 'ORCL', 'NKE', 'MRK', 'TMO', 'ABT', 'DHR', 'VZ', 'ADBE',
-      'CVX', 'ASML', 'TXN', 'ACN', 'QCOM', 'AMD', 'HON', 'CMCSA', 'NEE'
+    // Fetch exclusion patterns from database
+    const { data: excludedSymbols } = await supabase
+      .from('cedear_metadata')
+      .select('symbol')
+      .eq('is_excluded', true);
+
+    const excludedSet = new Set(excludedSymbols?.map(item => item.symbol) || []);
+
+    // Common exclusion patterns for derivatives/duplicates
+    const exclusionPatterns = [
+      /.*C$/,    // Class C shares (AAPLC, GOOGC)
+      /.*D$/,    // Class D shares (AAPLD)
+      /.*2$/,    // 2x leveraged (TSLA2, MSFT2)
+      /.*3$/,    // 3x leveraged
+      /.*L$/,    // Long versions
+      /.*S$/,    // Short versions
+      /.*X$/,    // Complex derivatives
     ];
 
     // Fetch prices from data912.com
-    console.log('Fetching CEDEAR prices from data912.com...');
+    console.log('Fetching ALL CEDEAR prices from data912.com...');
     
     const response = await fetch('https://data912.com/live/arg_cedears', {
       method: 'GET',
       headers: {
-        'User-Agent': 'CEDEAR-Folio-Buddy/1.0',
+        'User-Agent': 'CEDEAR-Enhanced-System/2.0',
         'Accept': 'application/json'
       },
     });
@@ -66,12 +76,42 @@ serve(async (req) => {
     }
 
     const rawPrices: CedearPriceData[] = await response.json();
-    console.log(`Fetched ${rawPrices.length} price entries`);
+    console.log(`Fetched ${rawPrices.length} total price entries from API`);
 
-    // Filter and process prices
+    // Smart filtering logic for all 504+ tickers
     const processedPrices: ProcessedPrice[] = rawPrices
-      .filter(price => TRACKED_CEDEARS.includes(price.symbol))
-      .filter(price => price.px_bid > 0 && price.px_ask > 0 && price.c > 0)
+      .filter(price => {
+        // Basic data validation
+        if (!price.symbol || price.px_bid <= 0 || price.px_ask <= 0 || price.c <= 0) {
+          return false;
+        }
+
+        const symbol = price.symbol.toUpperCase().trim();
+
+        // Check if manually excluded
+        if (excludedSet.has(symbol)) {
+          console.log(`Excluding ${symbol}: manually excluded`);
+          return false;
+        }
+
+        // Check exclusion patterns for derivatives/duplicates
+        if (exclusionPatterns.some(pattern => pattern.test(symbol))) {
+          console.log(`Excluding ${symbol}: matches derivative pattern`);
+          return false;
+        }
+
+        // Volume filter (configurable minimum)
+        if (price.v < 100) { // Minimum 100 volume
+          return false;
+        }
+
+        // Price filter (exclude penny stocks)
+        if (price.c < 1.0) { // Minimum $1 ARS
+          return false;
+        }
+
+        return true;
+      })
       .map(price => ({
         symbol: price.symbol.toUpperCase().trim(),
         px_bid: Number(price.px_bid.toFixed(4)),
@@ -81,13 +121,16 @@ serve(async (req) => {
         pct_change: Number(price.pct_change.toFixed(4))
       }))
       .reduce((acc, current) => {
+        // Remove duplicates (keep first occurrence)
         if (!acc.find(item => item.symbol === current.symbol)) {
           acc.push(current);
         }
         return acc;
-      }, [] as ProcessedPrice[]);
+      }, [] as ProcessedPrice[])
+      .sort((a, b) => b.volume - a.volume); // Sort by volume (highest first)
 
-    console.log(`Processed ${processedPrices.length} valid prices`);
+    console.log(`After filtering: ${processedPrices.length} valid CEDEARs`);
+    console.log(`Top 10 by volume: ${processedPrices.slice(0, 10).map(p => `${p.symbol}(${p.volume})`).join(', ')}`);
 
     if (processedPrices.length === 0) {
       console.log('No valid prices to save');
