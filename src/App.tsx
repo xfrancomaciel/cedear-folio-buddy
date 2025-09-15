@@ -25,6 +25,7 @@ import Analizador from "./pages/Analizador";
 import YouTube from "./pages/YouTube";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReports from "./pages/AdminReports";
+import AdminFeatures from "./pages/AdminFeatures";
 import Optimizador from "./pages/Optimizador";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -136,6 +137,16 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <AdminReports />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/features"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <AdminFeatures />
                 </AppLayout>
               </ProtectedRoute>
             }

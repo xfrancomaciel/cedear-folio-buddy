@@ -46,6 +46,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DollarRates } from "@/components/DollarRates";
 import { AdminPanel } from "@/components/AdminPanel/AdminPanel";
@@ -125,23 +126,27 @@ const portfolioItems = [
 
 const herramientasItems = [
   {
-    title: "Graficador",
-    url: "/herramientas/graficador",
-    tooltip: "Gráficos avanzados TradingView",
+  title: "Graficador",
+  url: "/herramientas/graficador",
+  icon: ChartLine,
+  tooltip: "Gráficos avanzados TradingView",
   },
-  {
+{
     title: "Mapa",
     url: "/herramientas/mapa",
+    icon: Map,
     tooltip: "Mapa de calor de acciones",
   },
   {
     title: "Screener",
-    url: "/herramientas/screener",
+    url: "/herramientas/screener", 
+    icon: Search,
     tooltip: "Screener de acciones",
   },
   {
     title: "Analizador",
     url: "/herramientas/analizador",
+    icon: BarChart3,
     tooltip: "Análisis completo de acciones",
   },
 ];
@@ -150,6 +155,7 @@ export function InvestorDashboard() {
   const location = useLocation();
   const { user, profile } = useAuth();
   const { isAdmin } = useUserRole();
+  const { isFeatureEnabled } = useFeatureFlags();
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(
     location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
   );
@@ -213,7 +219,15 @@ export function InvestorDashboard() {
           <SidebarGroupLabel>Aplicaciones</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
+              {navigationItems
+                .filter(item => {
+                  // Si es admin, mostrar todo
+                  if (isAdmin) return true;
+                  // Si no es admin, verificar si la feature está habilitada
+                  const featureKey = item.url.replace('/', '');
+                  return isFeatureEnabled(featureKey);
+                })
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   {'comingSoon' in item && item.comingSoon ? (
                     <SidebarMenuButton 
@@ -239,70 +253,86 @@ export function InvestorDashboard() {
               ))}
               
               {/* Portfolio Collapsible Section */}
-              <Collapsible open={isPortfolioOpen} onOpenChange={setIsPortfolioOpen}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton 
-                      tooltip="Gestión de portfolio"
-                      isActive={location.pathname === '/portfolio' && !location.hash}
-                    >
-                      <PieChart />
-                      <span>Portfolio</span>
-                      <ChevronRight className={`ml-auto transition-transform duration-200 ${isPortfolioOpen ? 'rotate-90' : ''}`} />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {portfolioItems.map((item) => (
-                        <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton 
-                            asChild
-                            isActive={item.url.includes('#') ? 
-                              location.pathname + location.hash === item.url : 
-                              location.pathname === item.url}
-                          >
-                            <Link to={item.url}>
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {(isAdmin || isFeatureEnabled('portfolio')) && (
+                <Collapsible open={isPortfolioOpen} onOpenChange={setIsPortfolioOpen}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton 
+                        tooltip="Gestión de portfolio"
+                        isActive={location.pathname === '/portfolio' && !location.hash}
+                      >
+                        <PieChart />
+                        <span>Portfolio</span>
+                        <ChevronRight className={`ml-auto transition-transform duration-200 ${isPortfolioOpen ? 'rotate-90' : ''}`} />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {portfolioItems.map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton 
+                              asChild
+                              isActive={item.url.includes('#') ? 
+                                location.pathname + location.hash === item.url : 
+                                location.pathname === item.url}
+                            >
+                              <Link to={item.url}>
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
 
               {/* Herramientas Collapsible Section */}
-              <Collapsible open={isHerramientasOpen} onOpenChange={setIsHerramientasOpen}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton 
-                      tooltip="Herramientas de trading"
-                      isActive={location.pathname.startsWith('/herramientas')}
-                    >
-                      <Wrench />
-                      <span>Herramientas</span>
-                      <ChevronRight className={`ml-auto transition-transform duration-200 ${isHerramientasOpen ? 'rotate-90' : ''}`} />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {herramientasItems.map((item) => (
-                        <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton 
-                            asChild
-                            isActive={location.pathname === item.url}
-                          >
-                            <Link to={item.url}>
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {herramientasItems.some(item => {
+                const featureKey = item.url.replace('/herramientas/', '');
+                return isAdmin || isFeatureEnabled(featureKey);
+              }) && (
+                <Collapsible open={isHerramientasOpen} onOpenChange={setIsHerramientasOpen}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton 
+                        tooltip="Herramientas de trading"
+                        isActive={location.pathname.startsWith('/herramientas')}
+                      >
+                        <Wrench />
+                        <span>Herramientas</span>
+                        <ChevronRight className={`ml-auto transition-transform duration-200 ${isHerramientasOpen ? 'rotate-90' : ''}`} />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {herramientasItems
+                          .filter(item => {
+                            // Si es admin, mostrar todo
+                            if (isAdmin) return true;
+                            // Obtener la feature key basada en la URL
+                            const featureKey = item.url.replace('/herramientas/', '');
+                            return isFeatureEnabled(featureKey);
+                          })
+                          .map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton 
+                              asChild
+                              isActive={location.pathname === item.url}
+                            >
+                              <Link to={item.url}>
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

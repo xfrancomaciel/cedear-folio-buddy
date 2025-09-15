@@ -28,6 +28,12 @@ const adminItems = [
     url: "/admin/reports",
     icon: FileText,
     tooltip: "Administrar reportes y publicaciones"
+  },
+  {
+    title: "Gestión de Features",
+    url: "/admin/features",
+    icon: Settings,
+    tooltip: "Habilitar/deshabilitar funcionalidades"
   }
 ];
 
