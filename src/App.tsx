@@ -13,6 +13,7 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import TradingViewTickerTape from "@/components/TradingView/TradingViewTickerTape";
 import Index from "./pages/Index";
 import CedearPrices from "./pages/CedearPrices";
+import CursoInicial from "./pages/CursoInicial";
 import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Formaciones from "./pages/Formaciones";
@@ -43,6 +44,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout><CedearPrices /></AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/curso-inicial" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout><CursoInicial /></AppLayout>
                 </ProtectedRoute>
               } 
             />

@@ -59,6 +59,12 @@ const navigationItems = [
     tooltip: "Precios CEDEAR",
   },
   {
+    title: "Curso inicial completo",
+    url: "/curso-inicial",
+    icon: PlayCircle,
+    tooltip: "Curso completo para principiantes",
+  },
+  {
     title: "Formaciones",
     url: "/formaciones",
     icon: GraduationCap,
