@@ -6,6 +6,7 @@ import { TransactionForm } from '@/components/Portfolio/TransactionForm';
 import { TransactionHistory } from '@/components/Portfolio/TransactionHistory';
 import { RealizedGainsTable } from '@/components/Portfolio/RealizedGainsTable';
 import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
+import { ImportExportButtons } from '@/components/Portfolio/ImportExportButtons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -165,6 +166,12 @@ const Index = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Import/Export Portfolio */}
+                <ImportExportButtons 
+                  transactions={transactions}
+                  addTransaction={addTransaction}
+                />
+                
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Datos del Portfolio</h3>
                   <p className="text-sm text-muted-foreground mb-4">
