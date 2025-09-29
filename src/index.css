@@ -194,4 +194,17 @@
       transform: translateY(0);
     }
   }
+
+  /* Hide Chipp chat widget on mobile devices */
+  @media (max-width: 767px) {
+    #chipp-widget,
+    iframe[src*="chipp"],
+    div[id*="chipp"],
+    .chipp-chat-widget {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  }
 }
