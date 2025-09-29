@@ -8,6 +8,7 @@ import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
 import { BottomNavigation } from '@/components/Mobile/BottomNavigation';
 import { MobileHeader } from '@/components/Mobile/MobileHeader';
 import { PullToRefresh } from '@/components/Mobile/PullToRefresh';
+import { MobileInDevelopment } from '@/components/Mobile/MobileInDevelopment';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 import { useEnhancedCedearPrices } from '@/hooks/useEnhancedCedearPrices';
 import { useCedearSectors } from '@/hooks/useCedearSectors';
@@ -86,6 +87,11 @@ const CedearPrices = () => {
   const handleRefresh = async () => {
     await refresh();
   };
+
+  // Show mobile development screen
+  if (isMobile) {
+    return <MobileInDevelopment />;
+  }
 
   return (
     <TooltipProvider>

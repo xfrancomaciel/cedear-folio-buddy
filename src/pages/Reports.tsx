@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useMobileOptimizations } from "@/hooks/useMobileOptimizations";
 import { useReportsManagement, Report } from "@/hooks/useReportsManagement";
 import { useUserRole } from "@/hooks/useUserRole";
+import { MobileInDevelopment } from "@/components/Mobile/MobileInDevelopment";
 import { cn } from "@/lib/utils";
 
 const Reports = () => {
@@ -45,6 +46,11 @@ const Reports = () => {
         </div>
       </div>
     );
+  }
+
+  // Show mobile development screen
+  if (isMobile) {
+    return <MobileInDevelopment />;
   }
 
   return (
