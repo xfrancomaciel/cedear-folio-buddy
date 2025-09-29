@@ -58,6 +58,11 @@
 
     --radius: 0.75rem;
 
+    /* Mobile Optimizations */
+    --mobile-header-height: 3.5rem;
+    --bottom-nav-height: 5rem;
+    --mobile-safe-area: env(safe-area-inset-bottom, 0px);
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;

@@ -7,16 +7,21 @@ import { TransactionHistory } from '@/components/Portfolio/TransactionHistory';
 import { RealizedGainsTable } from '@/components/Portfolio/RealizedGainsTable';
 import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
 import { ImportExportButtons } from '@/components/Portfolio/ImportExportButtons';
+import { BottomNavigation } from '@/components/Mobile/BottomNavigation';
+import { MobileHeader } from '@/components/Mobile/MobileHeader';
+import { PullToRefresh } from '@/components/Mobile/PullToRefresh';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
+import { PieChart, Plus, History, Settings, AlertTriangle, TrendingUp, BarChart3, RefreshCw } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isMobile, navigation, spacing } = useMobileOptimizations();
   const {
     transactions,
     currentPrices,
@@ -58,9 +63,27 @@ const Index = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    await refreshPrices();
+  };
+
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto">
+    <div className="min-h-screen bg-background">
+      {isMobile && (
+        <MobileHeader title="Portfolio" showSidebarTrigger={false}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={pricesLoading}
+          >
+            <RefreshCw className={`h-4 w-4 ${pricesLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </MobileHeader>
+      )}
+      
+      <PullToRefresh onRefresh={handleRefresh} disabled={pricesLoading}>
+        <div className={`container mx-auto ${spacing.mobile} ${navigation.bottomSpace}`}>
         {/* Price Update Status */}
         <div className="mb-6">
           <PriceUpdateStatus
@@ -231,7 +254,10 @@ const Index = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </PullToRefresh>
+      
+      <BottomNavigation />
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatCurrency } from '@/utils/portfolioCalculations';
 import { useCedearFavorites } from '@/hooks/useCedearFavorites';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
+import { CEDEARCard } from '@/components/Mobile/MobileCardView';
 
 interface CEDEARTableProps {
   prices: any[];
@@ -25,6 +27,7 @@ export const CEDEARTable: React.FC<CEDEARTableProps> = ({
   maxDisplayItems = 80
 }) => {
   const { isFavorite, toggleFavorite } = useCedearFavorites();
+  const { isMobile, tableMode } = useMobileOptimizations();
 
   const displayedPrices = useMemo(() => {
     if (showingAll) return prices;
@@ -72,6 +75,72 @@ export const CEDEARTable: React.FC<CEDEARTableProps> = ({
     );
   }
 
+  // Mobile Card View
+  if (isMobile && tableMode === 'cards') {
+    return (
+      <div className="space-y-4">
+        {/* Toggle Show All Button */}
+        {!showingAll && hiddenCount > 0 && onToggleShowAll && (
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              onClick={() => onToggleShowAll(true)}
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              Ver todos ({prices.length})
+              <Badge variant="secondary">+{hiddenCount}</Badge>
+            </Button>
+          </div>
+        )}
+
+        {/* Cards Grid */}
+        <div className="grid gap-3">
+          {displayedPrices
+            .sort((a, b) => {
+              // Sort favorites first, then by volume
+              const aFav = isFavorite(a.symbol);
+              const bFav = isFavorite(b.symbol);
+              if (aFav && !bFav) return -1;
+              if (!aFav && bFav) return 1;
+              return b.volume - a.volume;
+            })
+            .map((price) => {
+              const sectorInfo = sectors[price.symbol];
+              return (
+                <CEDEARCard
+                  key={price.id}
+                  symbol={price.symbol}
+                  name={sectorInfo?.company_name || 'N/A'}
+                  price={price.px_mid}
+                  variation={price.pct_change}
+                  sector={sectorInfo?.sector}
+                  isFavorite={isFavorite(price.symbol)}
+                  onToggleFavorite={() => toggleFavorite(price.symbol)}
+                  onSelect={() => {}} // TODO: Add detail view
+                />
+              );
+            })}
+        </div>
+
+        {/* Show All Button at Bottom */}
+        {!showingAll && hiddenCount > 0 && onToggleShowAll && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              onClick={() => onToggleShowAll(true)}
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              Ver {hiddenCount} más
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop Table View
   return (
     <div className="space-y-4">
       {/* Toggle Show All Button */}

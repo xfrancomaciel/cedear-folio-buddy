@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PriceUpdateStatus } from '@/components/Portfolio/PriceUpdateStatus';
+import { BottomNavigation } from '@/components/Mobile/BottomNavigation';
+import { MobileHeader } from '@/components/Mobile/MobileHeader';
+import { PullToRefresh } from '@/components/Mobile/PullToRefresh';
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 import { useEnhancedCedearPrices } from '@/hooks/useEnhancedCedearPrices';
 import { useCedearSectors } from '@/hooks/useCedearSectors';
@@ -17,7 +20,7 @@ import { CEDEARFavorites } from '@/components/CEDEARs/CEDEARFavorites';
 import { cn } from '@/lib/utils';
 
 const CedearPrices = () => {
-  const { isMobile, touchTargetSize, cardSpacing } = useMobileOptimizations();
+  const { isMobile, touchTargetSize, cardSpacing, spacing, navigation } = useMobileOptimizations();
   const [showAllCedears, setShowAllCedears] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
 
@@ -80,10 +83,28 @@ const CedearPrices = () => {
     setShowFavorites(false);
   };
 
+  const handleRefresh = async () => {
+    await refresh();
+  };
+
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background p-4">
-        <div className="container mx-auto max-w-7xl">
+      <div className="min-h-screen bg-background">
+        {isMobile && (
+          <MobileHeader title="CEDEARs" showSidebarTrigger={false}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </MobileHeader>
+        )}
+        
+        <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
+          <div className={`container mx-auto max-w-7xl ${spacing.mobile} ${navigation.bottomSpace}`}>
           {/* Header */}
           <div className={cn("mb-6", cardSpacing)}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -277,8 +298,11 @@ const CedearPrices = () => {
               Datos proporcionados por data912.com • 
               Sistema inteligente de filtrado con {allPrices.length}+ CEDEARs disponibles
             </p>
+            </div>
           </div>
-        </div>
+        </PullToRefresh>
+        
+        <BottomNavigation />
       </div>
     </TooltipProvider>
   );

@@ -7,6 +7,8 @@ import { formatCurrency, formatPercentage } from '@/utils/portfolioCalculations'
 import { getCEDEARInfo } from '@/data/cedearsData';
 import { Briefcase, TrendingDown } from 'lucide-react';
 import { SellTransactionDialog } from './SellTransactionDialog';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
+import { PortfolioCard } from '@/components/Mobile/MobileCardView';
 
 interface PositionsTableProps {
   positions: Position[];
@@ -23,6 +25,7 @@ interface PositionsTableProps {
 }
 
 export const PositionsTable = ({ positions, onSellTransaction, currentPrices }: PositionsTableProps) => {
+  const { isMobile, tableMode } = useMobileOptimizations();
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [isSellDialogOpen, setIsSellDialogOpen] = useState(false);
 
@@ -62,16 +65,68 @@ export const PositionsTable = ({ positions, onSellTransaction, currentPrices }: 
     );
   }
 
+  // Mobile Card View
+  if (isMobile && tableMode === 'cards') {
+    return (
+      <>
+        <Card className="card-financial">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5" />
+              Posiciones ({positions.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              {positions.map((position) => {
+                const cedearsInfo = getCEDEARInfo(position.ticker);
+                const currentPrice = currentPrices[position.ticker]?.precio_ars || position.precio_promedio_ars;
+                const gainLoss = position.valor_actual_ars - (position.precio_promedio_ars * position.cantidad);
+                const gainLossPercent = position.precio_promedio_ars > 0 
+                  ? ((currentPrice - position.precio_promedio_ars) / position.precio_promedio_ars) * 100 
+                  : 0;
+
+                return (
+                  <PortfolioCard
+                    key={position.ticker}
+                    symbol={position.ticker}
+                    quantity={position.cantidad}
+                    avgPrice={position.precio_promedio_ars}
+                    currentPrice={currentPrice}
+                    totalValue={position.valor_actual_ars}
+                    gainLoss={gainLoss}
+                    gainLossPercent={gainLossPercent}
+                    onSell={() => handleSellClick(position)}
+                    onViewDetail={() => {}} // TODO: Add detail view
+                  />
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <SellTransactionDialog
+          position={selectedPosition}
+          isOpen={isSellDialogOpen}
+          onClose={() => setIsSellDialogOpen(false)}
+          onSell={handleSellTransaction}
+        />
+      </>
+    );
+  }
+
+  // Desktop Table View
   return (
-    <Card className="card-financial">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Briefcase className="h-5 w-5" />
-          Posiciones ({positions.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
+    <>
+      <Card className="card-financial">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5" />
+            Posiciones ({positions.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/50">
@@ -186,6 +241,7 @@ export const PositionsTable = ({ positions, onSellTransaction, currentPrices }: 
           </table>
         </div>
       </CardContent>
+      </Card>
 
       <SellTransactionDialog
         position={selectedPosition}
@@ -194,6 +250,6 @@ export const PositionsTable = ({ positions, onSellTransaction, currentPrices }: 
         onSell={handleSellTransaction}
         currentPrice={selectedPosition ? currentPrices[selectedPosition.ticker]?.precio_ars : undefined}
       />
-    </Card>
+    </>
   );
 };

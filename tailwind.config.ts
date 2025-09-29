@@ -13,6 +13,17 @@ export default {
       },
     },
     extend: {
+      screens: {
+        'xs': '475px',
+        'mobile': {'max': '767px'},
+        'tablet': {'min': '768px', 'max': '1023px'},
+        'desktop': {'min': '1024px'},
+      },
+      spacing: {
+        'safe-area-inset-bottom': 'env(safe-area-inset-bottom)',
+        '18': '4.5rem',
+        '88': '22rem',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
