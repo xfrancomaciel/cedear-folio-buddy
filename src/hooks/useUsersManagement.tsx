@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ExtendedUserProfile } from '@/types/admin';
 
 export interface UserProfile {
   id: string;
@@ -15,7 +16,7 @@ export interface UserProfile {
 }
 
 export function useUsersManagement() {
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [users, setUsers] = useState<ExtendedUserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,10 +46,44 @@ export function useUsersManagement() {
 
       if (rolesError) throw rolesError;
 
-      // Create a map of user roles
+      // Get user plans
+      const { data: plansData, error: plansError } = await supabase
+        .from('user_plans')
+        .select('user_id, plan, is_active');
+
+      if (plansError) throw plansError;
+
+      // Get portfolio data (aggregated transactions)
+      const { data: portfolioData, error: portfolioError } = await supabase
+        .from('transactions')
+        .select('user_id, total_usd, total_ars, ticker, tipo')
+        .eq('tipo', 'Compra');
+
+      if (portfolioError) console.error('Error fetching portfolio data:', portfolioError);
+
+      // Create maps for efficient lookups
       const rolesMap = new Map();
       rolesData?.forEach(roleEntry => {
         rolesMap.set(roleEntry.user_id, roleEntry.role);
+      });
+
+      const plansMap = new Map();
+      plansData?.forEach(planEntry => {
+        plansMap.set(planEntry.user_id, {
+          plan: planEntry.plan,
+          is_active: planEntry.is_active
+        });
+      });
+
+      // Calculate portfolio values per user
+      const portfolioMap = new Map<string, { usd: number; ars: number; transactions: number }>();
+      portfolioData?.forEach(transaction => {
+        const current = portfolioMap.get(transaction.user_id) || { usd: 0, ars: 0, transactions: 0 };
+        portfolioMap.set(transaction.user_id, {
+          usd: current.usd + (transaction.total_usd || 0),
+          ars: current.ars + (transaction.total_ars || 0),
+          transactions: current.transactions + 1
+        });
       });
 
       // Get auth users data (requires admin access)
@@ -65,12 +100,26 @@ export function useUsersManagement() {
       }
 
       // Combine all data
-      const combinedUsers = profilesData?.map(profile => ({
-        ...profile,
-        role: rolesMap.get(profile.id) || 'user',
-        email: authUsersMap.get(profile.id)?.email,
-        last_sign_in_at: authUsersMap.get(profile.id)?.last_sign_in_at
-      })) || [];
+      const combinedUsers: ExtendedUserProfile[] = profilesData?.map(profile => {
+        const portfolio = portfolioMap.get(profile.id);
+        const plan = plansMap.get(profile.id);
+        const authData = authUsersMap.get(profile.id);
+
+        return {
+          ...profile,
+          role: rolesMap.get(profile.id) || 'user',
+          email: authData?.email,
+          last_sign_in_at: authData?.last_sign_in_at,
+          plan: plan?.plan || 'cliente',
+          plan_status: plan?.is_active ? 'active' : 'none',
+          portfolio_value_usd: portfolio?.usd || 0,
+          portfolio_value_ars: portfolio?.ars || 0,
+          total_transactions: portfolio?.transactions || 0,
+          is_active: authData?.last_sign_in_at ? 
+            (new Date().getTime() - new Date(authData.last_sign_in_at).getTime()) < (30 * 24 * 60 * 60 * 1000) : 
+            false
+        };
+      }) || [];
 
       setUsers(combinedUsers);
     } catch (err: any) {
@@ -104,6 +153,33 @@ export function useUsersManagement() {
     }
   };
 
+  const updateUserPlan = async (userId: string, newPlan: 'cliente' | 'premium' | 'enterprise') => {
+    try {
+      const { error } = await supabase
+        .from('user_plans')
+        .upsert({ 
+          user_id: userId, 
+          plan: newPlan,
+          is_active: true,
+          start_date: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      // Update local state
+      setUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, plan: newPlan, plan_status: 'active' } : user
+      ));
+
+      toast.success('Plan actualizado correctamente');
+      return { error: null };
+    } catch (err: any) {
+      console.error('Error updating user plan:', err);
+      toast.error('Error al actualizar el plan');
+      return { error: err.message };
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     try {
       // Delete from auth.users (this will cascade to profiles and user_roles)
@@ -133,6 +209,7 @@ export function useUsersManagement() {
     error,
     refetch: fetchUsers,
     updateUserRole,
+    updateUserPlan,
     deleteUser
   };
 }

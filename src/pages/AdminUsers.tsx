@@ -1,45 +1,89 @@
-import React from 'react';
-import { useUsersManagement } from '@/hooks/useUsersManagement';
+import { useState, useMemo } from 'react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUsersManagement } from '@/hooks/useUsersManagement';
+import { useUsersTableFilters } from '@/hooks/useUsersTableFilters';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { 
-  Users, 
-  Shield, 
-  UserCheck, 
-  Trash2, 
-  RefreshCw,
-  Calendar,
-  Mail,
-  User
-} from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { UserStatsCards } from '@/components/AdminPanel/UserStatsCards';
+import { UserTableFilters } from '@/components/AdminPanel/UserTableFilters';
+import { UsersTable } from '@/components/AdminPanel/UsersTable';
+import { ExportUsersButton } from '@/components/AdminPanel/ExportUsersButton';
+import { RefreshCw, AlertCircle, Shield } from 'lucide-react';
+import { UserStats } from '@/types/admin';
 
-const AdminUsers = () => {
+export default function AdminUsers() {
   const { isAdmin, loading: roleLoading } = useUserRole();
-  const { users, loading, error, refetch, updateUserRole, deleteUser } = useUsersManagement();
+  const { users, loading, error, refetch, updateUserRole, updateUserPlan, deleteUser } = useUsersManagement();
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Calculate statistics
+  const stats: UserStats = useMemo(() => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return {
+      totalUsers: users.length,
+      activeUsers: users.filter(u => u.is_active).length,
+      newUsersThisMonth: users.filter(u => new Date(u.created_at) >= startOfMonth).length,
+      byRole: {
+        admin: users.filter(u => u.role === 'admin').length,
+        moderator: users.filter(u => u.role === 'moderator').length,
+        user: users.filter(u => u.role === 'user').length
+      },
+      byPlan: {
+        cliente: users.filter(u => u.plan === 'cliente').length,
+        premium: users.filter(u => u.plan === 'premium').length,
+        enterprise: users.filter(u => u.plan === 'enterprise').length
+      },
+      totalPortfolioValueUSD: users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0),
+      totalPortfolioValueARS: users.reduce((sum, u) => sum + (u.portfolio_value_ars || 0), 0),
+      averagePortfolioValueUSD: users.length > 0 
+        ? users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0) / users.length 
+        : 0
+    };
+  }, [users]);
+
+  // Use filters hook
+  const {
+    filters,
+    setSearchTerm,
+    setRoleFilter,
+    setPlanFilter,
+    setActiveFilter,
+    setPortfolioRangeFilter,
+    clearFilters,
+    paginatedUsers,
+    sortField,
+    sortDirection,
+    handleSort,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    totalPages,
+    totalFilteredUsers
+  } = useUsersTableFilters(users);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  const handleRoleChange = async (userId: string, newRole: 'admin' | 'moderator' | 'user') => {
+    await updateUserRole(userId, newRole);
+  };
+
+  const handlePlanChange = async (userId: string, newPlan: 'cliente' | 'premium' | 'enterprise') => {
+    await updateUserPlan(userId, newPlan);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    await deleteUser(userId);
+  };
 
   if (roleLoading) {
     return (
@@ -74,220 +118,97 @@ const AdminUsers = () => {
     );
   }
 
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'destructive';
-      case 'moderator':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return Shield;
-      case 'moderator':
-        return UserCheck;
-      default:
-        return User;
-    }
-  };
-
-  const getUserInitials = (user: any) => {
-    if (user.full_name) {
-      return user.full_name
-        .split(' ')
-        .map((name: string) => name[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-    }
-    if (user.username) return user.username.slice(0, 2).toUpperCase();
-    if (user.email) return user.email.slice(0, 2).toUpperCase();
-    return 'U';
-  };
-
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    if (newRole === 'admin' || newRole === 'moderator' || newRole === 'user') {
-      await updateUserRole(userId, newRole);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    await deleteUser(userId);
-  };
-
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Gestión de Usuarios</h1>
-            <p className="text-muted-foreground">
-              Administra los usuarios del sistema y sus roles
-            </p>
-          </div>
-          <Button 
-            variant="outline" 
-            onClick={refetch} 
-            disabled={loading}
-            className="flex items-center gap-2"
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Administración de Usuarios</h1>
+          <p className="text-muted-foreground">
+            Gestiona usuarios, roles, planes y portfolios
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <ExportUsersButton users={users} disabled={loading} />
+          <Button
+            onClick={handleRefresh}
+            disabled={loading || refreshing}
+            variant="outline"
+            size="sm"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Actualizar
           </Button>
         </div>
-
-        {error && (
-          <Card className="mb-6 border-destructive">
-            <CardContent className="pt-6">
-              <p className="text-destructive">Error: {error}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        <div className="grid gap-6 mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Estadísticas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <div className="text-2xl font-bold">{users.length}</div>
-                  <div className="text-sm text-muted-foreground">Total Usuarios</div>
-                </div>
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <div className="text-2xl font-bold">
-                    {users.filter(u => u.role === 'admin').length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Administradores</div>
-                </div>
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <div className="text-2xl font-bold">
-                    {users.filter(u => u.role === 'user').length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Usuarios Regulares</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Usuarios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {users.map((user) => {
-                  const RoleIcon = getRoleIcon(user.role || 'user');
-                  
-                  return (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/20 transition-colors">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage src={user.avatar_url} />
-                          <AvatarFallback>
-                            {getUserInitials(user)}
-                          </AvatarFallback>
-                        </Avatar>
-                        
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">
-                              {user.full_name || user.username || 'Sin nombre'}
-                            </span>
-                            <Badge variant={getRoleBadgeVariant(user.role || 'user')}>
-                              <RoleIcon className="h-3 w-3 mr-1" />
-                              {user.role || 'user'}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            {user.email && (
-                              <div className="flex items-center gap-1">
-                                <Mail className="h-3 w-3" />
-                                {user.email}
-                              </div>
-                            )}
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              Registrado: {format(new Date(user.created_at), 'dd/MM/yyyy', { locale: es })}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={user.role || 'user'}
-                          onValueChange={(value) => handleRoleChange(user.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">Usuario</SelectItem>
-                            <SelectItem value="moderator">Moderador</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>¿Eliminar Usuario?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Esta acción no se puede deshacer. Se eliminará permanentemente
-                                la cuenta del usuario y todos sus datos.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="bg-destructive hover:bg-destructive/90"
-                              >
-                                Eliminar
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Statistics Cards */}
+      <UserStatsCards stats={stats} loading={loading} />
+
+      {/* Filters */}
+      <UserTableFilters
+        filters={filters}
+        onSearchChange={setSearchTerm}
+        onRoleChange={setRoleFilter}
+        onPlanChange={setPlanFilter}
+        onActiveChange={setActiveFilter}
+        onPortfolioMinChange={(min) => setPortfolioRangeFilter({ ...filters.portfolioRange, min })}
+        onPortfolioMaxChange={(max) => setPortfolioRangeFilter({ ...filters.portfolioRange, max })}
+        onClearFilters={clearFilters}
+      />
+
+      {/* Users Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Lista de Usuarios ({totalFilteredUsers})
+          </CardTitle>
+          <CardDescription>
+            {totalFilteredUsers !== users.length && 
+              `Mostrando ${totalFilteredUsers} de ${users.length} usuarios`
+            }
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center space-x-4 p-4">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                  <Skeleton className="h-10 w-[100px]" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <UsersTable
+              users={paginatedUsers}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+              onRoleChange={handleRoleChange}
+              onPlanChange={handlePlanChange}
+              onDeleteUser={handleDeleteUser}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+              totalUsers={totalFilteredUsers}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default AdminUsers;
+}

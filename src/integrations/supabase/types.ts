@@ -270,7 +270,7 @@ export type Database = {
           alias: string | null
           correct_answers: number | null
           created_at: string
-          email: string
+          email: string | null
           final_capital: number
           id: string
           time_used: number
@@ -280,7 +280,7 @@ export type Database = {
           alias?: string | null
           correct_answers?: number | null
           created_at?: string
-          email: string
+          email?: string | null
           final_capital: number
           id?: string
           time_used: number
@@ -290,7 +290,7 @@ export type Database = {
           alias?: string | null
           correct_answers?: number | null
           created_at?: string
-          email?: string
+          email?: string | null
           final_capital?: number
           id?: string
           time_used?: number
@@ -625,6 +625,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_plans: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          plan: Database["public"]["Enums"]["plan_type"]
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          plan?: Database["public"]["Enums"]["plan_type"]
+          start_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          plan?: Database["public"]["Enums"]["plan_type"]
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -742,6 +775,7 @@ export type Database = {
         | "CABA"
         | "Corporativo"
       law_type: "Argentina" | "New York" | "Inglaterra"
+      plan_type: "cliente" | "premium" | "enterprise"
       rating_type:
         | "AAA"
         | "AA+"
@@ -919,6 +953,7 @@ export const Constants = {
         "Corporativo",
       ],
       law_type: ["Argentina", "New York", "Inglaterra"],
+      plan_type: ["cliente", "premium", "enterprise"],
       rating_type: [
         "AAA",
         "AA+",

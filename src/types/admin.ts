@@ -1,0 +1,72 @@
+import { UserProfile } from '@/hooks/useUsersManagement';
+
+export interface ExtendedUserProfile extends UserProfile {
+  portfolio_value_usd?: number;
+  portfolio_value_ars?: number;
+  total_transactions?: number;
+  plan?: string;
+  plan_status?: 'active' | 'expired' | 'none';
+  is_active?: boolean; // Activo si ingresó en los últimos 30 días
+}
+
+export interface UserTableFilters {
+  search: string;
+  role: 'all' | 'admin' | 'moderator' | 'user';
+  plan: 'all' | 'cliente' | 'premium' | 'enterprise';
+  isActive: 'all' | 'active' | 'inactive';
+  dateRange: {
+    from: Date | null;
+    to: Date | null;
+  };
+  portfolioRange: {
+    min: number | null;
+    max: number | null;
+  };
+}
+
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number; // Usuarios activos en últimos 30 días
+  newUsersThisMonth: number;
+  byRole: {
+    admin: number;
+    moderator: number;
+    user: number;
+  };
+  byPlan: {
+    cliente: number;
+    premium: number;
+    enterprise: number;
+  };
+  totalPortfolioValueUSD: number;
+  totalPortfolioValueARS: number;
+  averagePortfolioValueUSD: number;
+}
+
+export interface ExportUserData {
+  'Nombre Completo': string;
+  'Email': string;
+  'Username': string;
+  'Rol': string;
+  'Plan': string;
+  'Estado Plan': string;
+  'Fecha Registro': string;
+  'Último Ingreso': string;
+  'Total Transacciones': number;
+  'Portfolio USD': number;
+  'Portfolio ARS': number;
+  'Estado Usuario': string;
+}
+
+export type SortField = 
+  | 'full_name' 
+  | 'email' 
+  | 'role' 
+  | 'plan' 
+  | 'last_sign_in_at' 
+  | 'portfolio_value_usd' 
+  | 'portfolio_value_ars'
+  | 'total_transactions'
+  | 'created_at';
+
+export type SortDirection = 'asc' | 'desc';
