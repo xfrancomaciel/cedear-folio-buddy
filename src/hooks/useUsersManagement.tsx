@@ -25,7 +25,7 @@ export function useUsersManagement() {
       setLoading(true);
       setError(null);
 
-      // First get all profiles
+      // First get all profiles with email
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -33,6 +33,7 @@ export function useUsersManagement() {
           username,
           full_name,
           avatar_url,
+          email,
           created_at,
           updated_at
         `);
@@ -86,38 +87,26 @@ export function useUsersManagement() {
         });
       });
 
-      // Get auth users data (requires admin access)
-      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
-      
-      let authUsersMap = new Map<string, { email?: string; last_sign_in_at?: string }>();
-      if (!authError && authUsers) {
-        authUsers.forEach((authUser: any) => {
-          authUsersMap.set(authUser.id, {
-            email: authUser.email,
-            last_sign_in_at: authUser.last_sign_in_at
-          });
-        });
-      }
-
       // Combine all data
       const combinedUsers: ExtendedUserProfile[] = profilesData?.map(profile => {
         const portfolio = portfolioMap.get(profile.id);
         const plan = plansMap.get(profile.id);
-        const authData = authUsersMap.get(profile.id);
+
+        // Calculate if user is active (has activity in last 30 days)
+        // Using updated_at as a proxy for last activity since we can't access auth.users
+        const isActive = profile.updated_at ? 
+          (new Date().getTime() - new Date(profile.updated_at).getTime()) < (30 * 24 * 60 * 60 * 1000) : 
+          false;
 
         return {
           ...profile,
           role: rolesMap.get(profile.id) || 'user',
-          email: authData?.email,
-          last_sign_in_at: authData?.last_sign_in_at,
           plan: plan?.plan || 'cliente',
           plan_status: plan?.is_active ? 'active' : 'none',
           portfolio_value_usd: portfolio?.usd || 0,
           portfolio_value_ars: portfolio?.ars || 0,
           total_transactions: portfolio?.transactions || 0,
-          is_active: authData?.last_sign_in_at ? 
-            (new Date().getTime() - new Date(authData.last_sign_in_at).getTime()) < (30 * 24 * 60 * 60 * 1000) : 
-            false
+          is_active: isActive
         };
       }) || [];
 
