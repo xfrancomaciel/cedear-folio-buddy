@@ -40,10 +40,10 @@ export function UserStatsCards({ stats, loading }: UserStatsCardsProps) {
       color: 'text-blue-600'
     },
     {
-      title: 'Usuarios Premium',
-      value: stats.byPlan.premium + stats.byPlan.enterprise,
+      title: 'Usuarios Planes Premium',
+      value: stats.byPlan.bdi_inicial + stats.byPlan.bdi_plus,
       icon: CreditCard,
-      description: `${stats.byPlan.cliente} plan cliente`,
+      description: `${stats.byPlan.cliente} clientes, ${stats.byPlan.bdi_inicial} BDI Inicial, ${stats.byPlan.bdi_plus} BDI Plus`,
       color: 'text-purple-600'
     },
     {

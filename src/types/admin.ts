@@ -4,7 +4,7 @@ export interface ExtendedUserProfile extends UserProfile {
   portfolio_value_usd?: number;
   portfolio_value_ars?: number;
   total_transactions?: number;
-  plan?: string;
+  plan?: 'cliente' | 'bdi_inicial' | 'bdi_plus';
   plan_status?: 'active' | 'expired' | 'none';
   is_active?: boolean; // Activo si ingresó en los últimos 30 días
 }
@@ -12,7 +12,7 @@ export interface ExtendedUserProfile extends UserProfile {
 export interface UserTableFilters {
   search: string;
   role: 'all' | 'admin' | 'moderator' | 'user';
-  plan: 'all' | 'cliente' | 'premium' | 'enterprise';
+  plan: 'all' | 'cliente' | 'bdi_inicial' | 'bdi_plus';
   isActive: 'all' | 'active' | 'inactive';
   dateRange: {
     from: Date | null;
@@ -35,8 +35,8 @@ export interface UserStats {
   };
   byPlan: {
     cliente: number;
-    premium: number;
-    enterprise: number;
+    bdi_inicial: number;
+    bdi_plus: number;
   };
   totalPortfolioValueUSD: number;
   totalPortfolioValueARS: number;

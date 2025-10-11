@@ -142,7 +142,7 @@ export function useUsersManagement() {
     }
   };
 
-  const updateUserPlan = async (userId: string, newPlan: 'cliente' | 'premium' | 'enterprise') => {
+  const updateUserPlan = async (userId: string, newPlan: 'cliente' | 'bdi_inicial' | 'bdi_plus') => {
     try {
       const { error } = await supabase
         .from('user_plans')

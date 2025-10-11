@@ -781,7 +781,7 @@ export type Database = {
         | "CABA"
         | "Corporativo"
       law_type: "Argentina" | "New York" | "Inglaterra"
-      plan_type: "cliente" | "premium" | "enterprise"
+      plan_type: "cliente" | "bdi_inicial" | "bdi_plus"
       rating_type:
         | "AAA"
         | "AA+"
@@ -959,7 +959,7 @@ export const Constants = {
         "Corporativo",
       ],
       law_type: ["Argentina", "New York", "Inglaterra"],
-      plan_type: ["cliente", "premium", "enterprise"],
+      plan_type: ["cliente", "bdi_inicial", "bdi_plus"],
       rating_type: [
         "AAA",
         "AA+",

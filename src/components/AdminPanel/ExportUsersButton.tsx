@@ -82,8 +82,8 @@ export function ExportUsersButton({ users, disabled }: ExportUsersButtonProps) {
         [''],
         ['Distribución por Planes:'],
         ['Plan Cliente:', users.filter(u => u.plan === 'cliente').length],
-        ['Plan Premium:', users.filter(u => u.plan === 'premium').length],
-        ['Plan Enterprise:', users.filter(u => u.plan === 'enterprise').length]
+        ['Plan BDI Inicial:', users.filter(u => u.plan === 'bdi_inicial').length],
+        ['Plan BDI Plus:', users.filter(u => u.plan === 'bdi_plus').length]
       ];
 
       // Crear libro de Excel

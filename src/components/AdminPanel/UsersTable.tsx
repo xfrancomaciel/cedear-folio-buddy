@@ -31,7 +31,7 @@ interface UsersTableProps {
   sortDirection: SortDirection;
   onSort: (field: SortField) => void;
   onRoleChange: (userId: string, newRole: 'admin' | 'moderator' | 'user') => Promise<void>;
-  onPlanChange: (userId: string, newPlan: 'cliente' | 'premium' | 'enterprise') => Promise<void>;
+  onPlanChange: (userId: string, newPlan: 'cliente' | 'bdi_inicial' | 'bdi_plus') => Promise<void>;
   onDeleteUser: (userId: string) => Promise<void>;
   currentPage: number;
   totalPages: number;
@@ -235,8 +235,8 @@ export function UsersTable({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="cliente">Cliente</SelectItem>
-                          <SelectItem value="premium">Premium</SelectItem>
-                          <SelectItem value="enterprise">Enterprise</SelectItem>
+                          <SelectItem value="bdi_inicial">BDI Inicial</SelectItem>
+                          <SelectItem value="bdi_plus">BDI Plus</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

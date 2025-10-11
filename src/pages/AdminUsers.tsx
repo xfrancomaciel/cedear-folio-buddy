@@ -19,11 +19,11 @@ export default function AdminUsers() {
   // Separate users by category
   const userCategories = useMemo(() => {
     const admins = users.filter(u => u.role === 'admin');
-    const premium = users.filter(u => u.role !== 'admin' && u.plan === 'premium');
+    const bdiPlus = users.filter(u => u.role !== 'admin' && u.plan === 'bdi_plus');
+    const bdiInicial = users.filter(u => u.role !== 'admin' && u.plan === 'bdi_inicial');
     const cliente = users.filter(u => u.role !== 'admin' && u.plan === 'cliente');
-    const enterprise = users.filter(u => u.role !== 'admin' && u.plan === 'enterprise');
     
-    return { admins, premium, cliente, enterprise };
+    return { admins, bdiPlus, bdiInicial, cliente };
   }, [users]);
 
   // Calculate statistics
@@ -43,8 +43,8 @@ export default function AdminUsers() {
       },
       byPlan: {
         cliente: users.filter(u => u.plan === 'cliente').length,
-        premium: users.filter(u => u.plan === 'premium').length,
-        enterprise: users.filter(u => u.plan === 'enterprise').length
+        bdi_inicial: users.filter(u => u.plan === 'bdi_inicial').length,
+        bdi_plus: users.filter(u => u.plan === 'bdi_plus').length
       },
       totalPortfolioValueUSD: users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0),
       totalPortfolioValueARS: users.reduce((sum, u) => sum + (u.portfolio_value_ars || 0), 0),
@@ -64,7 +64,7 @@ export default function AdminUsers() {
     await updateUserRole(userId, newRole);
   };
 
-  const handlePlanChange = async (userId: string, newPlan: 'cliente' | 'premium' | 'enterprise') => {
+  const handlePlanChange = async (userId: string, newPlan: 'cliente' | 'bdi_inicial' | 'bdi_plus') => {
     await updateUserPlan(userId, newPlan);
   };
 
@@ -194,19 +194,19 @@ export default function AdminUsers() {
             </Card>
           )}
 
-          {/* BDI Plus (Premium) Users */}
-          {userCategories.premium.length > 0 && (
+          {/* BDI Plus Users */}
+          {userCategories.bdiPlus.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Zap className="h-5 w-5 text-purple-500" />
                   <CardTitle>BDI Plus</CardTitle>
-                  <span className="text-sm text-muted-foreground">({userCategories.premium.length})</span>
+                  <span className="text-sm text-muted-foreground">({userCategories.bdiPlus.length})</span>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <UsersTable
-                  users={userCategories.premium}
+                  users={userCategories.bdiPlus}
                   sortField="full_name"
                   sortDirection="asc"
                   onSort={() => {}}
@@ -215,22 +215,52 @@ export default function AdminUsers() {
                   onDeleteUser={handleDeleteUser}
                   currentPage={1}
                   totalPages={1}
-                  itemsPerPage={userCategories.premium.length}
+                  itemsPerPage={userCategories.bdiPlus.length}
                   onPageChange={() => {}}
                   onItemsPerPageChange={() => {}}
-                  totalUsers={userCategories.premium.length}
+                  totalUsers={userCategories.bdiPlus.length}
                 />
               </CardContent>
             </Card>
           )}
 
-          {/* BDI Inicial (Cliente) Users */}
-          {userCategories.cliente.length > 0 && (
+          {/* BDI Inicial Users */}
+          {userCategories.bdiInicial.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-blue-500" />
                   <CardTitle>BDI Inicial</CardTitle>
+                  <span className="text-sm text-muted-foreground">({userCategories.bdiInicial.length})</span>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <UsersTable
+                  users={userCategories.bdiInicial}
+                  sortField="full_name"
+                  sortDirection="asc"
+                  onSort={() => {}}
+                  onRoleChange={handleRoleChange}
+                  onPlanChange={handlePlanChange}
+                  onDeleteUser={handleDeleteUser}
+                  currentPage={1}
+                  totalPages={1}
+                  itemsPerPage={userCategories.bdiInicial.length}
+                  onPageChange={() => {}}
+                  onItemsPerPageChange={() => {}}
+                  totalUsers={userCategories.bdiInicial.length}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Cliente Users */}
+          {userCategories.cliente.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-gray-500" />
+                  <CardTitle>Clientes</CardTitle>
                   <span className="text-sm text-muted-foreground">({userCategories.cliente.length})</span>
                 </div>
               </CardHeader>
@@ -249,36 +279,6 @@ export default function AdminUsers() {
                   onPageChange={() => {}}
                   onItemsPerPageChange={() => {}}
                   totalUsers={userCategories.cliente.length}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Enterprise Users */}
-          {userCategories.enterprise.length > 0 && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-gray-500" />
-                  <CardTitle>Enterprise</CardTitle>
-                  <span className="text-sm text-muted-foreground">({userCategories.enterprise.length})</span>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <UsersTable
-                  users={userCategories.enterprise}
-                  sortField="full_name"
-                  sortDirection="asc"
-                  onSort={() => {}}
-                  onRoleChange={handleRoleChange}
-                  onPlanChange={handlePlanChange}
-                  onDeleteUser={handleDeleteUser}
-                  currentPage={1}
-                  totalPages={1}
-                  itemsPerPage={userCategories.enterprise.length}
-                  onPageChange={() => {}}
-                  onItemsPerPageChange={() => {}}
-                  totalUsers={userCategories.enterprise.length}
                 />
               </CardContent>
             </Card>
