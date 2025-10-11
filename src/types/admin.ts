@@ -41,18 +41,12 @@ export interface UserStats {
 }
 
 export interface ExportUserData {
-  'Nombre Completo': string;
+  'Usuario': string;
   'Email': string;
-  'Username': string;
   'Rol': string;
   'Plan': string;
-  'Estado Plan': string;
-  'Fecha Registro': string;
   'Último Ingreso': string;
-  'Total Transacciones': number;
-  'Portfolio USD': number;
-  'Portfolio ARS': number;
-  'Estado Usuario': string;
+  'Registro': string;
 }
 
 export type SortField = 
