@@ -56,42 +56,8 @@ export function ExportUsersButton({ users, disabled }: ExportUsersButtonProps) {
         'Estado Usuario': getUserStatus(user.last_sign_in_at)
       }));
 
-      // Calcular totales
-      const totalPortfolioUSD = users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0);
-      const totalPortfolioARS = users.reduce((sum, u) => sum + (u.portfolio_value_ars || 0), 0);
-      const totalTransactions = users.reduce((sum, u) => sum + (u.total_transactions || 0), 0);
-      const activeUsers = users.filter(u => getUserStatus(u.last_sign_in_at) === 'Activo').length;
-
-      // Crear hoja de resumen
-      const summaryData = [
-        ['Resumen de Usuarios - BDI Suite'],
-        ['Fecha de Exportación:', format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })],
-        [''],
-        ['Total de Usuarios:', users.length],
-        ['Usuarios Activos:', activeUsers],
-        ['Usuarios Inactivos:', users.length - activeUsers],
-        [''],
-        ['Total Portfolio USD:', totalPortfolioUSD],
-        ['Total Portfolio ARS:', totalPortfolioARS],
-        ['Total Transacciones:', totalTransactions],
-        [''],
-        ['Distribución por Roles:'],
-        ['Administradores:', users.filter(u => u.role === 'admin').length],
-        ['Moderadores:', users.filter(u => u.role === 'moderator').length],
-        ['Usuarios:', users.filter(u => u.role === 'user').length],
-        [''],
-        ['Distribución por Planes:'],
-        ['Plan Cliente:', users.filter(u => u.plan === 'cliente').length],
-        ['Plan BDI Inicial:', users.filter(u => u.plan === 'bdi_inicial').length],
-        ['Plan BDI Plus:', users.filter(u => u.plan === 'bdi_plus').length]
-      ];
-
       // Crear libro de Excel
       const workbook = XLSX.utils.book_new();
-
-      // Agregar hoja de resumen
-      const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
 
       // Agregar hoja de usuarios
       const usersSheet = XLSX.utils.json_to_sheet(exportData);
