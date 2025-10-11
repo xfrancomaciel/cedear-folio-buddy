@@ -150,7 +150,7 @@ export function UsersTable({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[1200px]">
+        <div className="min-w-[900px]">
           <Table>
           <TableHeader>
             <TableRow>
@@ -159,9 +159,6 @@ export function UsersTable({
               <SortableHeader field="role">Rol</SortableHeader>
               <SortableHeader field="plan">Plan</SortableHeader>
               <SortableHeader field="last_sign_in_at">Último Ingreso</SortableHeader>
-              <SortableHeader field="portfolio_value_usd">Portfolio USD</SortableHeader>
-              <SortableHeader field="portfolio_value_ars">Portfolio ARS</SortableHeader>
-              <SortableHeader field="total_transactions">Trans.</SortableHeader>
               <SortableHeader field="created_at">Registro</SortableHeader>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -169,7 +166,7 @@ export function UsersTable({
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No se encontraron usuarios que coincidan con los filtros
                 </TableCell>
               </TableRow>
@@ -257,15 +254,6 @@ export function UsersTable({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(user.portfolio_value_usd, 'USD')}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(user.portfolio_value_ars, 'ARS')}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {user.total_transactions || 0}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(user.created_at)}
