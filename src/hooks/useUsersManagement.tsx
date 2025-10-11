@@ -25,7 +25,7 @@ export function useUsersManagement() {
       setLoading(true);
       setError(null);
 
-      // First get all profiles with email
+      // First get all profiles with email and last_sign_in_at
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -34,6 +34,7 @@ export function useUsersManagement() {
           full_name,
           avatar_url,
           email,
+          last_sign_in_at,
           created_at,
           updated_at
         `);
@@ -93,9 +94,8 @@ export function useUsersManagement() {
         const plan = plansMap.get(profile.id);
 
         // Calculate if user is active (has activity in last 30 days)
-        // Using updated_at as a proxy for last activity since we can't access auth.users
-        const isActive = profile.updated_at ? 
-          (new Date().getTime() - new Date(profile.updated_at).getTime()) < (30 * 24 * 60 * 60 * 1000) : 
+        const isActive = profile.last_sign_in_at ? 
+          (new Date().getTime() - new Date(profile.last_sign_in_at).getTime()) < (30 * 24 * 60 * 60 * 1000) : 
           false;
 
         return {
