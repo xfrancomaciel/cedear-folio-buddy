@@ -119,7 +119,7 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -176,7 +176,7 @@ export default function AdminUsers() {
             }
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {loading ? (
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (

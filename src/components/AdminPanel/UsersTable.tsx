@@ -149,8 +149,9 @@ export function UsersTable({
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[1200px]">
+          <Table>
           <TableHeader>
             <TableRow>
               <SortableHeader field="full_name">Usuario</SortableHeader>
@@ -294,6 +295,7 @@ export function UsersTable({
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {/* Paginación */}
