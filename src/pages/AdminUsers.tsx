@@ -19,11 +19,11 @@ export default function AdminUsers() {
   // Separate users by category
   const userCategories = useMemo(() => {
     const admins = users.filter(u => u.role === 'admin');
-    const bdiPlus = users.filter(u => u.role !== 'admin' && u.plan === 'premium');
-    const bdiInicial = users.filter(u => u.role !== 'admin' && u.plan === 'cliente');
-    const others = users.filter(u => u.role !== 'admin' && u.plan !== 'premium' && u.plan !== 'cliente');
+    const premium = users.filter(u => u.role !== 'admin' && u.plan === 'premium');
+    const cliente = users.filter(u => u.role !== 'admin' && u.plan === 'cliente');
+    const enterprise = users.filter(u => u.role !== 'admin' && u.plan === 'enterprise');
     
-    return { admins, bdiPlus, bdiInicial, others };
+    return { admins, premium, cliente, enterprise };
   }, [users]);
 
   // Calculate statistics
@@ -194,19 +194,19 @@ export default function AdminUsers() {
             </Card>
           )}
 
-          {/* BDI+ Users */}
-          {userCategories.bdiPlus.length > 0 && (
+          {/* BDI Plus (Premium) Users */}
+          {userCategories.premium.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Zap className="h-5 w-5 text-purple-500" />
-                  <CardTitle>BDI+</CardTitle>
-                  <span className="text-sm text-muted-foreground">({userCategories.bdiPlus.length})</span>
+                  <CardTitle>BDI Plus</CardTitle>
+                  <span className="text-sm text-muted-foreground">({userCategories.premium.length})</span>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <UsersTable
-                  users={userCategories.bdiPlus}
+                  users={userCategories.premium}
                   sortField="full_name"
                   sortDirection="asc"
                   onSort={() => {}}
@@ -215,28 +215,28 @@ export default function AdminUsers() {
                   onDeleteUser={handleDeleteUser}
                   currentPage={1}
                   totalPages={1}
-                  itemsPerPage={userCategories.bdiPlus.length}
+                  itemsPerPage={userCategories.premium.length}
                   onPageChange={() => {}}
                   onItemsPerPageChange={() => {}}
-                  totalUsers={userCategories.bdiPlus.length}
+                  totalUsers={userCategories.premium.length}
                 />
               </CardContent>
             </Card>
           )}
 
-          {/* BDI Inicial Users */}
-          {userCategories.bdiInicial.length > 0 && (
+          {/* BDI Inicial (Cliente) Users */}
+          {userCategories.cliente.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-5 w-5 text-blue-500" />
                   <CardTitle>BDI Inicial</CardTitle>
-                  <span className="text-sm text-muted-foreground">({userCategories.bdiInicial.length})</span>
+                  <span className="text-sm text-muted-foreground">({userCategories.cliente.length})</span>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <UsersTable
-                  users={userCategories.bdiInicial}
+                  users={userCategories.cliente}
                   sortField="full_name"
                   sortDirection="asc"
                   onSort={() => {}}
@@ -245,28 +245,28 @@ export default function AdminUsers() {
                   onDeleteUser={handleDeleteUser}
                   currentPage={1}
                   totalPages={1}
-                  itemsPerPage={userCategories.bdiInicial.length}
+                  itemsPerPage={userCategories.cliente.length}
                   onPageChange={() => {}}
                   onItemsPerPageChange={() => {}}
-                  totalUsers={userCategories.bdiInicial.length}
+                  totalUsers={userCategories.cliente.length}
                 />
               </CardContent>
             </Card>
           )}
 
-          {/* Other Users */}
-          {userCategories.others.length > 0 && (
+          {/* Enterprise Users */}
+          {userCategories.enterprise.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-gray-500" />
-                  <CardTitle>Usuarios</CardTitle>
-                  <span className="text-sm text-muted-foreground">({userCategories.others.length})</span>
+                  <CardTitle>Enterprise</CardTitle>
+                  <span className="text-sm text-muted-foreground">({userCategories.enterprise.length})</span>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <UsersTable
-                  users={userCategories.others}
+                  users={userCategories.enterprise}
                   sortField="full_name"
                   sortDirection="asc"
                   onSort={() => {}}
@@ -275,10 +275,10 @@ export default function AdminUsers() {
                   onDeleteUser={handleDeleteUser}
                   currentPage={1}
                   totalPages={1}
-                  itemsPerPage={userCategories.others.length}
+                  itemsPerPage={userCategories.enterprise.length}
                   onPageChange={() => {}}
                   onItemsPerPageChange={() => {}}
-                  totalUsers={userCategories.others.length}
+                  totalUsers={userCategories.enterprise.length}
                 />
               </CardContent>
             </Card>
