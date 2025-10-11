@@ -49,19 +49,6 @@ export interface ExportUserData {
   'Registro': string;
 }
 
-export interface UserInvitation {
-  id: string;
-  email: string;
-  invited_by: string;
-  role: 'admin' | 'moderator' | 'user';
-  plan: 'cliente' | 'bdi_inicial' | 'bdi_plus';
-  status: 'pending' | 'accepted' | 'expired';
-  invited_at: string;
-  accepted_at?: string;
-  expires_at: string;
-  custom_message?: string;
-}
-
 export type SortField = 
   | 'full_name' 
   | 'email' 

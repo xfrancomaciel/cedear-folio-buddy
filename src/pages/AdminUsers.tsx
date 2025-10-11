@@ -8,7 +8,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserStatsCards } from '@/components/AdminPanel/UserStatsCards';
 import { UsersTable } from '@/components/AdminPanel/UsersTable';
 import { ExportUsersButton } from '@/components/AdminPanel/ExportUsersButton';
-import { InviteUserDialog } from '@/components/AdminPanel/InviteUserDialog';
 import { RefreshCw, AlertCircle, Shield, Crown, Zap, GraduationCap, Users } from 'lucide-react';
 import { UserStats, ExtendedUserProfile } from '@/types/admin';
 
@@ -112,7 +111,6 @@ export default function AdminUsers() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <InviteUserDialog onInviteSent={handleRefresh} />
           <ExportUsersButton users={users} disabled={loading} />
           <Button
             onClick={handleRefresh}
