@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, UserCheck, TrendingUp, Wallet, CreditCard, Calendar } from 'lucide-react';
+import { Users, UserCheck, Calendar, GraduationCap, Zap } from 'lucide-react';
 import { UserStats } from '@/types/admin';
 
 interface UserStatsCardsProps {
@@ -40,34 +40,25 @@ export function UserStatsCards({ stats, loading }: UserStatsCardsProps) {
       color: 'text-blue-600'
     },
     {
-      title: 'Usuarios Planes Premium',
-      value: stats.byPlan.bdi_inicial + stats.byPlan.bdi_plus,
-      icon: CreditCard,
-      description: `${stats.byPlan.cliente} clientes, ${stats.byPlan.bdi_inicial} BDI Inicial, ${stats.byPlan.bdi_plus} BDI Plus`,
+      title: 'Usuarios BDI Inicial',
+      value: stats.byPlan.bdi_inicial,
+      icon: GraduationCap,
+      description: 'Plan de formación inicial',
+      color: 'text-blue-600'
+    },
+    {
+      title: 'Usuarios BDI Plus',
+      value: stats.byPlan.bdi_plus,
+      icon: Zap,
+      description: 'Plan avanzado',
       color: 'text-purple-600'
-    },
-    {
-      title: 'Portfolio Total USD',
-      value: formatCurrency(stats.totalPortfolioValueUSD, 'USD'),
-      icon: Wallet,
-      description: `Promedio: ${formatCurrency(stats.averagePortfolioValueUSD, 'USD')}`,
-      color: 'text-emerald-600',
-      isLarge: true
-    },
-    {
-      title: 'Portfolio Total ARS',
-      value: formatCurrency(stats.totalPortfolioValueARS, 'ARS'),
-      icon: TrendingUp,
-      description: 'Valor total gestionado',
-      color: 'text-orange-600',
-      isLarge: true
     }
   ];
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {[...Array(5)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="h-4 bg-muted rounded w-20"></div>
@@ -84,11 +75,11 @@ export function UserStatsCards({ stats, loading }: UserStatsCardsProps) {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <Card key={index} className={stat.isLarge ? 'xl:col-span-2' : ''}>
+          <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 {stat.title}
@@ -96,7 +87,7 @@ export function UserStatsCards({ stats, loading }: UserStatsCardsProps) {
               <Icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${stat.isLarge ? 'text-xl lg:text-2xl' : ''}`}>
+              <div className="text-2xl font-bold">
                 {stat.value}
               </div>
               <p className="text-xs text-muted-foreground mt-1">

@@ -38,9 +38,6 @@ export interface UserStats {
     bdi_inicial: number;
     bdi_plus: number;
   };
-  totalPortfolioValueUSD: number;
-  totalPortfolioValueARS: number;
-  averagePortfolioValueUSD: number;
 }
 
 export interface ExportUserData {

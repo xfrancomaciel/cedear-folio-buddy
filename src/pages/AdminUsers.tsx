@@ -45,12 +45,7 @@ export default function AdminUsers() {
         cliente: users.filter(u => u.plan === 'cliente').length,
         bdi_inicial: users.filter(u => u.plan === 'bdi_inicial').length,
         bdi_plus: users.filter(u => u.plan === 'bdi_plus').length
-      },
-      totalPortfolioValueUSD: users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0),
-      totalPortfolioValueARS: users.reduce((sum, u) => sum + (u.portfolio_value_ars || 0), 0),
-      averagePortfolioValueUSD: users.length > 0 
-        ? users.reduce((sum, u) => sum + (u.portfolio_value_usd || 0), 0) / users.length 
-        : 0
+      }
     };
   }, [users]);
 

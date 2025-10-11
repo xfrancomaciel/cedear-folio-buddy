@@ -144,14 +144,16 @@ export function useUsersManagement() {
 
   const updateUserPlan = async (userId: string, newPlan: 'cliente' | 'bdi_inicial' | 'bdi_plus') => {
     try {
-      const { error } = await supabase
-        .from('user_plans')
-        .upsert({ 
-          user_id: userId, 
-          plan: newPlan,
-          is_active: true,
-          start_date: new Date().toISOString()
-        });
+    const { error } = await supabase
+      .from('user_plans')
+      .upsert({ 
+        user_id: userId, 
+        plan: newPlan,
+        is_active: true,
+        start_date: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
 
       if (error) throw error;
 
