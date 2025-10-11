@@ -214,7 +214,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (emailError) {
       console.error("Error sending email:", emailError);
-      throw new Error("Failed to send invitation email");
+      
+      // Check if it's a Resend testing limitation
+      if (emailError.message && emailError.message.includes('testing emails')) {
+        throw new Error(`Solo puedes enviar emails de prueba a bdiconsultora@gmail.com. Para enviar a otras direcciones, verifica un dominio en resend.com/domains`);
+      }
+      
+      throw new Error("No se pudo enviar el email de invitación");
     }
 
     console.log("Invitation email sent successfully");
