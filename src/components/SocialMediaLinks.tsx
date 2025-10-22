@@ -18,7 +18,7 @@ export const SocialMediaLinks = ({
 
   if (variant === 'sidebar') {
     return (
-      <div className={cn("flex items-center gap-2 px-4 py-2 border-t border-sidebar-border", className)}>
+      <div className={cn("flex items-center justify-center gap-3 px-4 py-2 border-t border-sidebar-border", className)}>
         <TooltipProvider>
           {SOCIAL_MEDIA_LINKS.map((social) => {
             const Icon = social.icon;
