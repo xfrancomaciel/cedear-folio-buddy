@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Loader2, Save, User, Mail, Calendar, LogOut } from 'lucide-react';
+import { Camera, Loader2, Save, User, Mail, Calendar, LogOut, Share2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 
 export default function Settings() {
   const { user, profile, updateProfile, uploadAvatar, signOut } = useAuth();
@@ -296,6 +297,22 @@ export default function Settings() {
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Social Media Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Comunidad BDI
+            </CardTitle>
+            <CardDescription>
+              Síguenos en nuestras redes sociales para contenido exclusivo
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SocialMediaLinks variant="expanded" showLabels={true} />
           </CardContent>
         </Card>
 

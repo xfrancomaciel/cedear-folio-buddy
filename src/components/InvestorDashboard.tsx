@@ -48,6 +48,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DollarRates } from "@/components/DollarRates";
 import { AdminPanel } from "@/components/AdminPanel/AdminPanel";
+import { SocialMediaLinks } from "@/components/SocialMediaLinks";
 import { toast } from "sonner";
 
 const navigationItems = [
@@ -338,6 +339,7 @@ export function InvestorDashboard() {
           </SidebarMenuItem>
         </SidebarMenu>
         <DollarRates />
+        <SocialMediaLinks variant="sidebar" />
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
