@@ -93,8 +93,8 @@ export function UserTableFilters({
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="cliente">Cliente</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-              <SelectItem value="enterprise">Enterprise</SelectItem>
+              <SelectItem value="bdi_inicial">BDI Inicial</SelectItem>
+              <SelectItem value="bdi_plus">BDI Plus</SelectItem>
             </SelectContent>
           </Select>
         </div>

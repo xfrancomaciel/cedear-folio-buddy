@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useUsersManagement } from '@/hooks/useUsersManagement';
+import { useUsersTableFilters } from '@/hooks/useUsersTableFilters';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserStatsCards } from '@/components/AdminPanel/UserStatsCards';
 import { UsersTable } from '@/components/AdminPanel/UsersTable';
+import { UserTableFilters } from '@/components/AdminPanel/UserTableFilters';
 import { ExportUsersButton } from '@/components/AdminPanel/ExportUsersButton';
 import { RefreshCw, AlertCircle, Shield, Crown, Zap, GraduationCap, Users } from 'lucide-react';
 import { UserStats, ExtendedUserProfile } from '@/types/admin';
@@ -16,15 +18,27 @@ export default function AdminUsers() {
   const { users, loading, error, refetch, updateUserRole, updateUserPlan, deleteUser } = useUsersManagement();
   const [refreshing, setRefreshing] = useState(false);
 
-  // Separate users by category
+  // Use filters hook
+  const {
+    filters,
+    setSearchTerm,
+    setRoleFilter,
+    setPlanFilter,
+    setActiveFilter,
+    setPortfolioRangeFilter,
+    clearFilters,
+    filteredUsers
+  } = useUsersTableFilters(users);
+
+  // Separate filtered users by category
   const userCategories = useMemo(() => {
-    const admins = users.filter(u => u.role === 'admin');
-    const bdiPlus = users.filter(u => u.role !== 'admin' && u.plan === 'bdi_plus');
-    const bdiInicial = users.filter(u => u.role !== 'admin' && u.plan === 'bdi_inicial');
-    const cliente = users.filter(u => u.role !== 'admin' && u.plan === 'cliente');
+    const admins = filteredUsers.filter(u => u.role === 'admin');
+    const bdiPlus = filteredUsers.filter(u => u.role !== 'admin' && u.plan === 'bdi_plus');
+    const bdiInicial = filteredUsers.filter(u => u.role !== 'admin' && u.plan === 'bdi_inicial');
+    const cliente = filteredUsers.filter(u => u.role !== 'admin' && u.plan === 'cliente');
     
     return { admins, bdiPlus, bdiInicial, cliente };
-  }, [users]);
+  }, [filteredUsers]);
 
   // Calculate statistics
   const stats: UserStats = useMemo(() => {
@@ -133,6 +147,18 @@ export default function AdminUsers() {
 
       {/* Statistics Cards */}
       <UserStatsCards stats={stats} loading={loading} />
+
+      {/* Filters */}
+      <UserTableFilters
+        filters={filters}
+        onSearchChange={setSearchTerm}
+        onRoleChange={setRoleFilter}
+        onPlanChange={setPlanFilter}
+        onActiveChange={setActiveFilter}
+        onPortfolioMinChange={(min) => setPortfolioRangeFilter({ ...filters.portfolioRange, min })}
+        onPortfolioMaxChange={(max) => setPortfolioRangeFilter({ ...filters.portfolioRange, max })}
+        onClearFilters={clearFilters}
+      />
 
       {loading ? (
         <div className="space-y-6">
