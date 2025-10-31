@@ -353,22 +353,22 @@ export function InvestorDashboard() {
               asChild 
               size="lg"
             >
-              <Link to="/configuracion" className="flex items-center gap-2 overflow-hidden">
+              <Link to="/configuracion" className="flex items-center gap-2 overflow-hidden w-full">
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage src={profile?.avatar_url} />
                   <AvatarFallback className="text-xs">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col min-w-0 flex-1 gap-0.5">
-                  <span className="truncate text-sm font-semibold">
+                <div className="flex flex-col min-w-0 flex-1 gap-0 overflow-hidden">
+                  <span className="truncate text-sm font-semibold leading-tight">
                     {getUserDisplayName()}
                   </span>
-                  <span className="truncate text-xs text-muted-foreground">
+                  <span className="truncate text-[11px] text-muted-foreground leading-tight">
                     {user?.email}
                   </span>
                   {plan && (
-                    <Badge variant="outline" className="w-fit text-[10px] px-1.5 py-0 mt-0.5">
+                    <Badge variant="outline" className="w-fit text-[10px] px-1.5 py-0 mt-1">
                       {PLAN_NAMES[plan]}
                     </Badge>
                   )}
