@@ -305,23 +305,21 @@ export function InvestorDashboard() {
             />
           )}
           
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      asChild 
-                      tooltip="Curso completo para principiantes (Premium)"
-                      isActive={location.pathname === '/curso-inicial'}
-                    >
-                      <Link to="/curso-inicial" className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                          <PlayCircle />
-                          <span>Curso inicial completo</span>
-                        </div>
-                        <Badge variant="secondary" className="ml-auto text-xs">
-                          Premium
-                        </Badge>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              asChild 
+              tooltip="Curso completo para principiantes (Premium)"
+              isActive={location.pathname === '/curso-inicial'}
+            >
+              <Link to="/curso-inicial">
+                <PlayCircle />
+                <span>Curso Inicial</span>
+                <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                  Premium
+                </Badge>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton 
               asChild 
@@ -342,7 +340,7 @@ export function InvestorDashboard() {
               <a href="https://bdi-consultora1.tiendup.com/c/membresiasbdi" target="_blank" rel="noopener noreferrer">
                 <GraduationCap />
                 <span>Formaciones</span>
-                <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
+                <ExternalLink className="ml-auto h-3 w-3 opacity-60 shrink-0" />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -355,22 +353,22 @@ export function InvestorDashboard() {
               asChild 
               size="lg"
             >
-              <Link to="/configuracion" className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+              <Link to="/configuracion" className="flex items-center gap-2 overflow-hidden">
+                <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage src={profile?.avatar_url} />
                   <AvatarFallback className="text-xs">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
+                <div className="flex flex-col min-w-0 flex-1 gap-0.5">
+                  <span className="truncate text-sm font-semibold">
                     {getUserDisplayName()}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
                     {user?.email}
                   </span>
                   {plan && (
-                    <Badge variant="outline" className="w-fit text-xs mt-1">
+                    <Badge variant="outline" className="w-fit text-[10px] px-1.5 py-0 mt-0.5">
                       {PLAN_NAMES[plan]}
                     </Badge>
                   )}
