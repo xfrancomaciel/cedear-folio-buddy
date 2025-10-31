@@ -40,7 +40,8 @@ import {
   Wrench,
   PlayCircle,
   ExternalLink,
-  PieChart
+  PieChart,
+  Crown
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -137,6 +138,7 @@ export function InvestorDashboard() {
   const { user, profile } = useAuth();
   const { isAdmin } = useUserRole();
   const { plan } = useUserPlan();
+  const isPremium = plan === 'bdi_inicial' || plan === 'bdi_plus';
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(
     location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
   );
@@ -353,18 +355,26 @@ export function InvestorDashboard() {
               asChild 
               size="lg"
             >
-              <Link to="/configuracion" className="flex items-center gap-2 overflow-hidden w-full">
-                <Avatar className="h-8 w-8 shrink-0">
+              <Link to="/configuracion" className="flex items-center gap-2 overflow-hidden w-full" aria-label={`Configuración. Plan: ${PLAN_NAMES[plan || 'cliente']}`}>
+                <Avatar className={`h-8 w-8 shrink-0 rounded-full ${isPremium ? 'ring-2 ring-amber-500/80' : ''}`}>
                   <AvatarImage src={profile?.avatar_url} />
                   <AvatarFallback className="text-xs">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col min-w-0 flex-1 gap-0 overflow-hidden">
-                  <span className="truncate text-sm font-semibold leading-tight">
-                    {getUserDisplayName()}
-                  </span>
-                  <span className="truncate text-[11px] text-muted-foreground leading-tight">
+                  <div className="flex items-center min-w-0 gap-1">
+                    <span className="truncate text-sm font-semibold leading-tight">
+                      {getUserDisplayName()}
+                    </span>
+                    {isPremium && (
+                      <Crown
+                        className="h-3.5 w-3.5 text-amber-500 shrink-0"
+                        aria-label={plan === 'bdi_plus' ? 'BDI Plus' : 'BDI Inicial'}
+                      />
+                    )}
+                  </div>
+                  <span className="truncate text-[11px] text-muted-foreground leading-tight" title={user?.email || ''}>
                     {user?.email}
                   </span>
                   {plan && (
