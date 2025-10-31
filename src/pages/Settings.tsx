@@ -6,14 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Loader2, Save, User, Mail, Calendar, LogOut, Share2 } from 'lucide-react';
+import { Camera, Loader2, Save, User, Mail, Calendar, LogOut, Share2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserPlan } from '@/hooks/useUserPlan';
+import { PLAN_NAMES } from '@/lib/planAuthorization';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 
 export default function Settings() {
   const { user, profile, updateProfile, uploadAvatar, signOut } = useAuth();
+  const { plan, isPremium, loading: planLoading } = useUserPlan();
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -258,6 +261,59 @@ export default function Settings() {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Plan Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tu Plan Actual</CardTitle>
+            <CardDescription>
+              Administra tu suscripción y accede a más contenido
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {planLoading ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Plan: {plan ? PLAN_NAMES[plan] : 'Sin plan'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {isPremium ? 'Acceso completo a contenido premium' : 'Acceso limitado'}
+                    </p>
+                  </div>
+                  <Badge variant={isPremium ? 'default' : 'secondary'}>
+                    {plan ? PLAN_NAMES[plan] : 'Sin plan'}
+                  </Badge>
+                </div>
+                
+                {!isPremium && (
+                  <Button asChild className="w-full">
+                    <a href="https://wa.me/5491133333333" target="_blank" rel="noopener noreferrer">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Actualizar a Premium
+                    </a>
+                  </Button>
+                )}
+
+                {isPremium && (
+                  <div className="rounded-lg bg-primary/10 p-4">
+                    <p className="text-sm font-medium text-primary">
+                      ✨ Disfrutás de todos los beneficios premium
+                    </p>
+                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                      <li>• Acceso al Curso Inicial Completo</li>
+                      <li>• Reportes y análisis avanzados</li>
+                      <li>• Soporte prioritario</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

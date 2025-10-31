@@ -1,8 +1,14 @@
 import React from 'react';
+import { PlanProtectedContent } from '@/components/PlanProtectedContent';
 
 const CursoInicial = () => {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <PlanProtectedContent 
+      requiredPlans={['bdi_inicial', 'bdi_plus']}
+      title="Curso Inicial Completo - Contenido Premium"
+      description="Este curso completo está disponible exclusivamente para miembros BDI Inicial y BDI Plus"
+    >
+      <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Curso Inicial Completo</h1>
         <p className="text-muted-foreground mt-2">
@@ -38,6 +44,7 @@ const CursoInicial = () => {
         </div>
       </div>
     </div>
+    </PlanProtectedContent>
   );
 };
 

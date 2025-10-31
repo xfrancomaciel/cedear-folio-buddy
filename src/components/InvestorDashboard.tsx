@@ -45,7 +45,10 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import { PLAN_NAMES } from "@/lib/planAuthorization";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { DollarRates } from "@/components/DollarRates";
 import { AdminPanel } from "@/components/AdminPanel/AdminPanel";
 import { SocialMediaLinks } from "@/components/SocialMediaLinks";
@@ -133,6 +136,7 @@ export function InvestorDashboard() {
   const location = useLocation();
   const { user, profile } = useAuth();
   const { isAdmin } = useUserRole();
+  const { plan } = useUserPlan();
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(
     location.pathname === '/portfolio' || location.pathname.startsWith('/portfolio')
   );
@@ -301,18 +305,23 @@ export function InvestorDashboard() {
             />
           )}
           
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              asChild 
-              tooltip="Curso completo para principiantes"
-              isActive={location.pathname === '/curso-inicial'}
-            >
-              <Link to="/curso-inicial">
-                <PlayCircle />
-                <span>Curso inicial completo</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      asChild 
+                      tooltip="Curso completo para principiantes (Premium)"
+                      isActive={location.pathname === '/curso-inicial'}
+                    >
+                      <Link to="/curso-inicial" className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                          <PlayCircle />
+                          <span>Curso inicial completo</span>
+                        </div>
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          Premium
+                        </Badge>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton 
               asChild 
@@ -360,6 +369,11 @@ export function InvestorDashboard() {
                   <span className="truncate text-xs text-muted-foreground">
                     {user?.email}
                   </span>
+                  {plan && (
+                    <Badge variant="outline" className="w-fit text-xs mt-1">
+                      {PLAN_NAMES[plan]}
+                    </Badge>
+                  )}
                 </div>
               </Link>
             </SidebarMenuButton>
