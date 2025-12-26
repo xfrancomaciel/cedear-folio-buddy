@@ -18,8 +18,8 @@ import type { OptimizerInput } from "@/types/optimizer";
 
 const Optimizador = () => {
   const [input, setInput] = useState<OptimizerInput>({
-    tickers: ["JPM", "GOLD", "V", "MRK", "FXI", "EWZ", "KO"],
-    weights: [10, 20, 20, 10, 10, 10, 20],
+    tickers: ["AAPL", "MSFT", "LLY", "AMZN", "V", "JPM", "GOLD", "HD", "KO", "PG"],
+    weights: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
     benchmark: "SPY",
     years: 10,
   });
