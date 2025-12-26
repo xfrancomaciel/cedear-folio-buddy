@@ -631,6 +631,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          custom_message: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string
+          plan: Database["public"]["Enums"]["plan_type"]
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          custom_message?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by: string
+          plan?: Database["public"]["Enums"]["plan_type"]
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          custom_message?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string
+          plan?: Database["public"]["Enums"]["plan_type"]
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_plans: {
         Row: {
           created_at: string
@@ -752,7 +797,7 @@ export type Database = {
     }
     Functions: {
       get_current_user_role: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
       has_role: {
