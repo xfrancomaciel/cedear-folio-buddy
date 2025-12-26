@@ -92,7 +92,7 @@ const App = () => (
             }
           />
             <Route
-              path="/portfolio/optimizador"
+              path="/optimizador"
               element={
                 <ProtectedRoute>
                   <AppLayout>
