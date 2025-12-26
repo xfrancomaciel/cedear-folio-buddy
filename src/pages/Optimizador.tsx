@@ -8,8 +8,12 @@ import { PerformanceChart } from "@/components/Optimizador/PerformanceChart";
 import { MetricsTable } from "@/components/Optimizador/MetricsTable";
 import { CAGRChart } from "@/components/Optimizador/CAGRChart";
 import { ExportButtons } from "@/components/Optimizador/ExportButtons";
+import { EfficientFrontierChart } from "@/components/Optimizador/EfficientFrontierChart";
+import { PortfolioWeightsChart } from "@/components/Optimizador/PortfolioWeightsChart";
+import { VaRChart } from "@/components/Optimizador/VaRChart";
+import { StressTestTable } from "@/components/Optimizador/StressTestTable";
 import { usePortfolioOptimizer } from "@/hooks/usePortfolioOptimizer";
-import { Target, TrendingUp, BarChart3, PieChart } from "lucide-react";
+import { Target, TrendingUp, BarChart3, PieChart, Zap, AlertTriangle, Activity } from "lucide-react";
 import type { OptimizerInput } from "@/types/optimizer";
 
 const Optimizador = () => {
@@ -27,6 +31,10 @@ const Optimizador = () => {
     analyze(newInput);
   };
 
+  const hasOptimization = result?.optimization;
+  const hasVaR = result?.varData && result.varData.length > 0;
+  const hasStressTest = result?.stressTest;
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -34,13 +42,12 @@ const Optimizador = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Optimizador de Cartera</h1>
           <p className="text-muted-foreground">
-            Analiza y optimiza tu portfolio con métricas avanzadas
+            Analiza y optimiza tu portfolio con Markowitz y Monte Carlo
           </p>
         </div>
       </div>
 
       <div className="grid gap-6">
-        {/* Form Section */}
         <Card className="card-financial">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -48,7 +55,7 @@ const Optimizador = () => {
               Configuración del Análisis
             </CardTitle>
             <CardDescription>
-              Define los activos, pesos y parámetros para el análisis de tu cartera
+              Define los activos, pesos y parámetros. Activa "Modo Optimización" para Markowitz.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -56,7 +63,6 @@ const Optimizador = () => {
           </CardContent>
         </Card>
 
-        {/* Results Section */}
         {isLoading && (
           <Card className="card-financial">
             <CardContent className="p-8">
@@ -79,14 +85,50 @@ const Optimizador = () => {
         )}
 
         {result && !isLoading && (
-          <Tabs defaultValue="metrics" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+          <Tabs defaultValue={hasOptimization ? "frontier" : "metrics"} className="space-y-6">
+            <TabsList className="flex flex-wrap h-auto gap-1">
+              {hasOptimization && (
+                <>
+                  <TabsTrigger value="frontier" className="flex items-center gap-1">
+                    <Zap className="h-4 w-4" />
+                    Frontera
+                  </TabsTrigger>
+                  <TabsTrigger value="weights">Pesos Óptimos</TabsTrigger>
+                </>
+              )}
               <TabsTrigger value="metrics">Métricas</TabsTrigger>
               <TabsTrigger value="composition">Composición</TabsTrigger>
               <TabsTrigger value="correlation">Correlación</TabsTrigger>
               <TabsTrigger value="performance">Rendimiento</TabsTrigger>
               <TabsTrigger value="cagr">CAGR</TabsTrigger>
+              {hasVaR && (
+                <TabsTrigger value="var" className="flex items-center gap-1">
+                  <AlertTriangle className="h-4 w-4" />
+                  VaR
+                </TabsTrigger>
+              )}
+              {hasStressTest && (
+                <TabsTrigger value="stress" className="flex items-center gap-1">
+                  <Activity className="h-4 w-4" />
+                  Stress Test
+                </TabsTrigger>
+              )}
             </TabsList>
+
+            {hasOptimization && (
+              <>
+                <TabsContent value="frontier">
+                  <EfficientFrontierChart result={result} />
+                </TabsContent>
+                <TabsContent value="weights">
+                  <PortfolioWeightsChart 
+                    maxSharpe={result.optimization!.maxSharpe}
+                    minVolatility={result.optimization!.minVolatility}
+                    targetReturn={result.optimization!.targetReturn}
+                  />
+                </TabsContent>
+              </>
+            )}
 
             <TabsContent value="metrics" className="space-y-6">
               <Card className="card-financial">
@@ -121,9 +163,7 @@ const Optimizador = () => {
               <Card className="card-financial">
                 <CardHeader>
                   <CardTitle>Matriz de Correlaciones</CardTitle>
-                  <CardDescription>
-                    Correlación entre activos de la cartera
-                  </CardDescription>
+                  <CardDescription>Correlación entre activos de la cartera</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <CorrelationMatrix result={result} />
@@ -135,9 +175,7 @@ const Optimizador = () => {
               <Card className="card-financial">
                 <CardHeader>
                   <CardTitle>Evolución del Rendimiento</CardTitle>
-                  <CardDescription>
-                    Comparación de rendimiento acumulado vs benchmark
-                  </CardDescription>
+                  <CardDescription>Comparación de rendimiento acumulado vs benchmark</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <PerformanceChart result={result} />
@@ -149,15 +187,28 @@ const Optimizador = () => {
               <Card className="card-financial">
                 <CardHeader>
                   <CardTitle>CAGR por Activo</CardTitle>
-                  <CardDescription>
-                    Rendimiento anualizado compuesto de cada activo
-                  </CardDescription>
+                  <CardDescription>Rendimiento anualizado compuesto de cada activo</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <CAGRChart result={result} />
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {hasVaR && (
+              <TabsContent value="var">
+                <VaRChart varData={result.varData!} />
+              </TabsContent>
+            )}
+
+            {hasStressTest && (
+              <TabsContent value="stress">
+                <StressTestTable 
+                  hypothetical={result.stressTest!.hypothetical}
+                  historical={result.stressTest!.historical}
+                />
+              </TabsContent>
+            )}
           </Tabs>
         )}
       </div>

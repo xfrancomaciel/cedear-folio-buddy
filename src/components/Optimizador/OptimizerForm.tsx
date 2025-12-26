@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Play, Loader2, Target, Zap } from "lucide-react";
 import type { OptimizerInput } from "@/types/optimizer";
 
 interface OptimizerFormProps {
@@ -17,6 +19,11 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
   const [weightsStr, setWeightsStr] = useState(initialInput.weights.join(", "));
   const [benchmark, setBenchmark] = useState(initialInput.benchmark);
   const [years, setYears] = useState(initialInput.years);
+  const [riskFreeRate, setRiskFreeRate] = useState(2);
+  const [minWeight, setMinWeight] = useState(0);
+  const [useTargetReturn, setUseTargetReturn] = useState(false);
+  const [targetReturn, setTargetReturn] = useState(10);
+  const [optimizeMode, setOptimizeMode] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,6 +37,11 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
 
     if (tickers.length === 0) {
       alert("Debe ingresar al menos 1 ticker.");
+      return;
+    }
+
+    if (optimizeMode && tickers.length < 2) {
+      alert("Para optimizar se necesitan al menos 2 tickers.");
       return;
     }
 
@@ -51,7 +63,6 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
         return;
       }
     } else {
-      // Equal weights
       weights = new Array(tickers.length).fill(100 / tickers.length);
     }
 
@@ -66,6 +77,10 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
       weights,
       benchmark,
       years,
+      riskFreeRate: riskFreeRate / 100,
+      minWeight: minWeight / 100,
+      targetReturn: useTargetReturn ? targetReturn / 100 : undefined,
+      mode: optimizeMode ? 'optimize' : 'analyze',
     };
 
     try {
@@ -105,14 +120,13 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
               onChange={(e) => setWeightsStr(e.target.value)}
               placeholder="10, 20, 20, 10, 10, 10, 20"
               className="mt-1"
+              disabled={optimizeMode}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Opcional. Si no se especifica, se usarán pesos iguales
+              {optimizeMode ? "Modo optimización: los pesos se calcularán automáticamente" : "Opcional. Si no se especifica, se usarán pesos iguales"}
             </p>
           </div>
-        </div>
 
-        <div className="space-y-4">
           <div>
             <Label htmlFor="benchmark" className="text-sm font-medium">
               Benchmark
@@ -149,6 +163,93 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
             </p>
           </div>
         </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium">
+              Tasa Libre de Riesgo: {riskFreeRate}%
+            </Label>
+            <Slider
+              value={[riskFreeRate]}
+              onValueChange={(v) => setRiskFreeRate(v[0])}
+              min={0}
+              max={10}
+              step={0.5}
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Usado para calcular Sharpe Ratio
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              <Label htmlFor="optimize-mode" className="text-sm font-medium cursor-pointer">
+                Modo Optimización (Markowitz)
+              </Label>
+            </div>
+            <Switch
+              id="optimize-mode"
+              checked={optimizeMode}
+              onCheckedChange={setOptimizeMode}
+            />
+          </div>
+
+          {optimizeMode && (
+            <>
+              <div>
+                <Label className="text-sm font-medium">
+                  Peso Mínimo por Activo: {minWeight}%
+                </Label>
+                <Slider
+                  value={[minWeight]}
+                  onValueChange={(v) => setMinWeight(v[0])}
+                  min={0}
+                  max={20}
+                  step={1}
+                  className="mt-2"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Restricción mínima de peso para cada activo
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <Label htmlFor="use-target" className="text-sm font-medium cursor-pointer">
+                    Retorno Objetivo
+                  </Label>
+                </div>
+                <Switch
+                  id="use-target"
+                  checked={useTargetReturn}
+                  onCheckedChange={setUseTargetReturn}
+                />
+              </div>
+
+              {useTargetReturn && (
+                <div>
+                  <Label className="text-sm font-medium">
+                    Retorno Objetivo: {targetReturn}%
+                  </Label>
+                  <Slider
+                    value={[targetReturn]}
+                    onValueChange={(v) => setTargetReturn(v[0])}
+                    min={1}
+                    max={50}
+                    step={1}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Buscar portfolio con mínima volatilidad para este retorno
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <Card className="bg-muted/50">
@@ -162,12 +263,12 @@ export const OptimizerForm = ({ onAnalyze, initialInput }: OptimizerFormProps) =
             {isAnalyzing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analizando...
+                {optimizeMode ? "Optimizando..." : "Analizando..."}
               </>
             ) : (
               <>
-                <Play className="mr-2 h-4 w-4" />
-                Analizar Cartera
+                {optimizeMode ? <Zap className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
+                {optimizeMode ? "Optimizar Cartera (Monte Carlo)" : "Analizar Cartera"}
               </>
             )}
           </Button>
