@@ -57,6 +57,12 @@ import { toast } from "sonner";
 
 const navigationItems = [
   {
+    title: "Optimizador",
+    url: "/optimizador",
+    icon: Target,
+    tooltip: "Optimizador de cartera Markowitz",
+  },
+  {
     title: "Reportes",
     url: "/reportes",
     icon: FileText,
@@ -71,7 +77,7 @@ const navigationItems = [
   {
     title: "Calculadora de Retiro",
     url: "/calculadora-retiro",
-    icon: Target,
+    icon: BarChart3,
     tooltip: "Calculadora de jubilación e inversión",
   },
 ];
@@ -100,12 +106,6 @@ const portfolioItems = [
     url: "/portfolio",
     icon: History,
     tooltip: "Historial de transacciones",
-  },
-  {
-    title: "Optimizador",
-    url: "/portfolio/optimizador",
-    icon: Target,
-    tooltip: "Optimización de cartera",
   },
   {
     title: "Configuración",
