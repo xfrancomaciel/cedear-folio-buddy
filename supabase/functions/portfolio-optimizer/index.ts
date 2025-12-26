@@ -88,49 +88,63 @@ serve(async (req) => {
 
     console.log(`Fetching data for ${allSymbols.length} symbols over ${years} years`);
 
-    for (const symbol of allSymbols) {
-      try {
-        const period1 = Math.floor(startDate.getTime() / 1000);
-        const period2 = Math.floor(endDate.getTime() / 1000);
-        
-        const url = `https://query1.finance.yahoo.com/v7/finance/download/${symbol}?period1=${period1}&period2=${period2}&interval=1d&events=history&includeAdjustedClose=true`;
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.warn(`Failed to fetch ${symbol}: ${response.status}`);
-          continue;
+  for (const symbol of allSymbols) {
+    try {
+      const period1 = Math.floor(startDate.getTime() / 1000);
+      const period2 = Math.floor(endDate.getTime() / 1000);
+      
+      // Use Yahoo Finance v8 chart API (no authentication required)
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1d&includeAdjustedClose=true`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
+      });
+      
+      if (!response.ok) {
+        console.warn(`Failed to fetch ${symbol}: ${response.status}`);
+        continue;
+      }
 
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        const header = lines[0].split(',');
+      const data = await response.json();
+      const result = data?.chart?.result?.[0];
+      
+      if (!result || !result.indicators?.adjclose?.[0]?.adjclose) {
+        console.warn(`No data in response for ${symbol}`);
+        continue;
+      }
+
+      const timestamps = result.timestamp || [];
+      const adjClosePrices = result.indicators.adjclose[0].adjclose || [];
+
+      const prices: number[] = [];
+      const dates: string[] = [];
+
+      for (let i = 0; i < timestamps.length; i++) {
+        const price = adjClosePrices[i];
+        const timestamp = timestamps[i];
         
-        const adjCloseIndex = header.findIndex(h => h === 'Adj Close');
-        if (adjCloseIndex === -1) continue;
-
-        const prices: number[] = [];
-        const dates: string[] = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',');
-          const price = parseFloat(values[adjCloseIndex]);
-          const date = values[0];
-          
-          if (!isNaN(price) && date) {
-            prices.push(price);
-            dates.push(date);
-          }
+        if (price !== null && !isNaN(price) && timestamp) {
+          prices.push(price);
+          // Convert timestamp to date string
+          const date = new Date(timestamp * 1000).toISOString().split('T')[0];
+          dates.push(date);
         }
+      }
 
-        if (prices.length < 2) continue;
+      if (prices.length < 2) {
+        console.warn(`Insufficient data for ${symbol}: ${prices.length} points`);
+        continue;
+      }
 
-        const returns: number[] = [];
-        for (let i = 1; i < prices.length; i++) {
-          returns.push((prices[i] - prices[i-1]) / prices[i-1]);
-        }
+      const returns: number[] = [];
+      for (let i = 1; i < prices.length; i++) {
+        returns.push((prices[i] - prices[i-1]) / prices[i-1]);
+      }
 
-        assetData[symbol] = { ticker: symbol, prices, returns, dates };
-        console.log(`Fetched ${prices.length} data points for ${symbol}`);
+      assetData[symbol] = { ticker: symbol, prices, returns, dates };
+      console.log(`Fetched ${prices.length} data points for ${symbol}`);
       } catch (error) {
         console.error(`Error fetching ${symbol}:`, error);
       }
