@@ -19,30 +19,50 @@ export const usePortfolioData = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Get unique tickers from transactions for real-time price updates
+  // Modo invitado: sin sesión usamos localStorage como almacenamiento principal
+  const isGuest = !user?.id;
+
   const tickers = [...new Set(transactions.map(tx => tx.ticker))];
-  const { 
-    prices: cedearPrices, 
-    loading: pricesLoading, 
+  const {
+    prices: cedearPrices,
+    loading: pricesLoading,
     error: pricesError,
     lastUpdated: pricesLastUpdated,
     refresh: refreshPrices
   } = useCedearPrices(tickers);
 
-  // Migrate localStorage data to Supabase
+  // ----- Helpers de localStorage (modo invitado) -----
+  const loadFromLocalStorage = () => {
+    try {
+      const savedTx = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+      const savedPrices = localStorage.getItem(STORAGE_KEYS.CURRENT_PRICES);
+      setTransactions(savedTx ? JSON.parse(savedTx) : []);
+      setCurrentPrices(savedPrices ? JSON.parse(savedPrices) : {});
+    } catch (e) {
+      console.error('Error leyendo localStorage:', e);
+      setTransactions([]);
+      setCurrentPrices({});
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const persistTransactions = (txs: Transaction[]) => {
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(txs));
+  };
+  const persistPrices = (prices: Record<string, CurrentPrice>) => {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_PRICES, JSON.stringify(prices));
+  };
+
+  // Migración localStorage -> Supabase cuando hay login
   const migrateLocalStorageData = async () => {
     if (!user?.id) return;
-    
     try {
-      // Check if we have localStorage data to migrate
       const savedTransactions = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
       const savedPrices = localStorage.getItem(STORAGE_KEYS.CURRENT_PRICES);
 
       if (savedTransactions) {
         const localTransactions = JSON.parse(savedTransactions);
-        console.log('Migrating', localTransactions.length, 'transactions to Supabase...');
-        
-        // Insert each transaction into Supabase
         for (const tx of localTransactions) {
           const enhanced = enhanceTransaction({
             user_id: user.id,
@@ -55,7 +75,6 @@ export const usePortfolioData = () => {
             total_ars: tx.total_ars,
             total_usd: tx.total_usd
           });
-
           await supabase.from('transactions').insert({
             user_id: user.id,
             fecha: enhanced.fecha,
@@ -72,49 +91,30 @@ export const usePortfolioData = () => {
             dias_tenencia: enhanced.dias_tenencia
           });
         }
-        
-        // Clear localStorage after successful migration
         localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
-        console.log('Transactions migrated successfully');
       }
 
       if (savedPrices) {
         const localPrices = JSON.parse(savedPrices);
         const priceArray = Object.values(localPrices) as CurrentPrice[];
-        
-        if (priceArray.length > 0) {
-          console.log('Migrating', priceArray.length, 'prices to Supabase...');
-          
-          for (const price of priceArray) {
-            await supabase.from('current_prices').upsert({
-              ticker: price.ticker,
-              precio_ars: price.precio_ars,
-              usd_rate: price.usd_rate
-            });
-          }
-          
-          localStorage.removeItem(STORAGE_KEYS.CURRENT_PRICES);
-          console.log('Prices migrated successfully');
+        for (const price of priceArray) {
+          await supabase.from('current_prices').upsert({
+            ticker: price.ticker,
+            precio_ars: price.precio_ars,
+            usd_rate: price.usd_rate
+          });
         }
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_PRICES);
       }
     } catch (error) {
-      console.error('Error migrating localStorage data:', error);
-      toast({
-        title: "Error de migración",
-        description: "Error al migrar datos locales a Supabase",
-        variant: "destructive"
-      });
+      console.error('Error migrando localStorage:', error);
     }
   };
 
-  // Load data from Supabase
   const loadData = async () => {
     if (!user?.id) return;
-    
     try {
       setIsLoading(true);
-      
-      // Load transactions for current user only
       const { data: transactionsData, error: transactionsError } = await supabase
         .from('transactions')
         .select('*')
@@ -122,17 +122,11 @@ export const usePortfolioData = () => {
         .order('fecha', { ascending: false });
 
       if (transactionsError) {
-        console.error('Error loading transactions:', transactionsError);
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar las transacciones",
-          variant: "destructive"
-        });
+        toast({ title: 'Error', description: 'No se pudieron cargar las transacciones', variant: 'destructive' });
       } else {
-        // Type-safe mapping from Supabase data to our Transaction type
         const typedTransactions: Transaction[] = (transactionsData || []).map(tx => ({
           ...tx,
-          tipo: tx.tipo as 'compra' | 'venta', // Type assertion for enum
+          tipo: tx.tipo as 'compra' | 'venta',
           fecha: tx.fecha,
           precio_ars: Number(tx.precio_ars),
           cantidad: Number(tx.cantidad),
@@ -147,57 +141,43 @@ export const usePortfolioData = () => {
         setTransactions(typedTransactions);
       }
 
-      // Load current prices
-      const { data: pricesData, error: pricesError } = await supabase
-        .from('current_prices')
-        .select('*');
-
-      if (pricesError) {
-        console.error('Error loading prices:', pricesError);
-      } else {
+      const { data: pricesData, error: pErr } = await supabase.from('current_prices').select('*');
+      if (!pErr) {
         const pricesRecord: Record<string, CurrentPrice> = {};
-        pricesData?.forEach(price => {
-          pricesRecord[price.ticker] = price;
-        });
+        pricesData?.forEach(price => { pricesRecord[price.ticker] = price; });
         setCurrentPrices(pricesRecord);
       }
     } catch (error) {
-      console.error('Error loading data from Supabase:', error);
+      console.error('Error cargando data Supabase:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    const initializeData = async () => {
-      if (user?.id) {
-        // First try to migrate any existing localStorage data
+    if (isGuest) {
+      loadFromLocalStorage();
+    } else {
+      (async () => {
         await migrateLocalStorageData();
-        // Then load all data from Supabase
         await loadData();
-      }
-    };
-    
-    initializeData();
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Recalculate portfolio summary when data changes
   useEffect(() => {
     if (transactions.length > 0) {
-      // Merge CEDEAR prices with current prices format
       const mergedPrices = { ...currentPrices };
-      
       Object.entries(cedearPrices).forEach(([ticker, price]) => {
         mergedPrices[ticker] = {
           ticker,
           precio_ars: price.px_close,
-          usd_rate: 1000, // Default rate for now
+          usd_rate: 1000,
           updated_at: price.last_updated
         };
       });
-
-      const summary = calculatePortfolioSummary(transactions, mergedPrices);
-      setPortfolioSummary(summary);
+      setPortfolioSummary(calculatePortfolioSummary(transactions, mergedPrices));
     } else {
       setPortfolioSummary(null);
     }
@@ -212,28 +192,43 @@ export const usePortfolioData = () => {
     usd_rate_historico: number;
     categoria?: TransactionCategory;
   }) => {
-    if (!user?.id) {
+    const total_ars = transaction.precio_ars * transaction.cantidad;
+    const total_usd = total_ars / transaction.usd_rate_historico;
+
+    if (isGuest) {
+      const enhanced = enhanceTransaction({
+        user_id: 'guest',
+        ...transaction,
+        total_ars,
+        total_usd
+      });
+      const newTx: Transaction = {
+        id: crypto.randomUUID(),
+        user_id: 'guest',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        categoria: transaction.categoria || 'Inversión',
+        ...enhanced
+      } as unknown as Transaction;
+      const updated = [newTx, ...transactions];
+      setTransactions(updated);
+      persistTransactions(updated);
       toast({
-        title: "Error",
-        description: "Debes estar autenticado para agregar transacciones",
-        variant: "destructive"
+        title: 'Transacción guardada (local)',
+        description: `${transaction.tipo} de ${transaction.cantidad} ${transaction.ticker} guardada en este navegador`
       });
       return;
     }
 
     try {
-      const total_ars = transaction.precio_ars * transaction.cantidad;
-      const total_usd = total_ars / transaction.usd_rate_historico;
-      
       const enhancedTransaction = enhanceTransaction({
-        user_id: user.id,
+        user_id: user!.id,
         ...transaction,
         total_ars,
         total_usd
       });
-
-      const { data, error } = await supabase.from('transactions').insert({
-        user_id: user.id,
+      const { error } = await supabase.from('transactions').insert({
+        user_id: user!.id,
         fecha: enhancedTransaction.fecha,
         tipo: enhancedTransaction.tipo,
         ticker: enhancedTransaction.ticker,
@@ -247,152 +242,90 @@ export const usePortfolioData = () => {
         precio_accion_usd: enhancedTransaction.precio_accion_usd,
         dias_tenencia: enhancedTransaction.dias_tenencia,
         categoria: transaction.categoria || 'Inversión'
-      }).select().single();
-
+      });
       if (error) {
-        console.error('Error adding transaction:', error);
-        toast({
-          title: "Error",
-          description: "No se pudo guardar la transacción",
-          variant: "destructive"
-        });
+        toast({ title: 'Error', description: 'No se pudo guardar la transacción', variant: 'destructive' });
         return;
       }
-
-      // Reload data after successful insert
       await loadData();
-      
-      toast({
-        title: "Transacción guardada",
-        description: `${transaction.tipo} de ${transaction.cantidad} ${transaction.ticker} guardada en Supabase`,
-      });
+      toast({ title: 'Transacción guardada', description: `${transaction.tipo} de ${transaction.cantidad} ${transaction.ticker}` });
     } catch (error) {
-      console.error('Error adding transaction:', error);
-      toast({
-        title: "Error",
-        description: "Error al guardar la transacción",
-        variant: "destructive"
-      });
+      console.error(error);
+      toast({ title: 'Error', description: 'Error al guardar la transacción', variant: 'destructive' });
     }
   };
 
   const updateCurrentPrice = async (ticker: string, precio_ars: number, usd_rate: number) => {
+    if (isGuest) {
+      const updated = {
+        ...currentPrices,
+        [ticker]: { ticker, precio_ars, usd_rate, updated_at: new Date().toISOString() }
+      };
+      setCurrentPrices(updated);
+      persistPrices(updated);
+      toast({ title: 'Precio actualizado (local)', description: `Precio de ${ticker} guardado en el navegador` });
+      return;
+    }
     try {
-      const { error } = await supabase.from('current_prices').upsert({
-        ticker,
-        precio_ars,
-        usd_rate
-      });
-
+      const { error } = await supabase.from('current_prices').upsert({ ticker, precio_ars, usd_rate });
       if (error) {
-        console.error('Error updating price:', error);
-        toast({
-          title: "Error",
-          description: "No se pudo actualizar el precio",
-          variant: "destructive"
-        });
+        toast({ title: 'Error', description: 'No se pudo actualizar el precio', variant: 'destructive' });
         return;
       }
-
-      // Update local state
-      const updatedPrices = {
+      setCurrentPrices({
         ...currentPrices,
-        [ticker]: {
-          ticker,
-          precio_ars,
-          usd_rate,
-          updated_at: new Date().toISOString()
-        }
-      };
-
-      setCurrentPrices(updatedPrices);
-      
-      toast({
-        title: "Precio actualizado",
-        description: `Precio de ${ticker} actualizado en Supabase`,
+        [ticker]: { ticker, precio_ars, usd_rate, updated_at: new Date().toISOString() }
       });
+      toast({ title: 'Precio actualizado', description: `Precio de ${ticker} actualizado` });
     } catch (error) {
-      console.error('Error updating price:', error);
-      toast({
-        title: "Error",
-        description: "Error al actualizar el precio",
-        variant: "destructive"
-      });
+      console.error(error);
     }
   };
 
   const deleteTransaction = async (id: string) => {
+    if (isGuest) {
+      const updated = transactions.filter(t => t.id !== id);
+      setTransactions(updated);
+      persistTransactions(updated);
+      toast({ title: 'Transacción eliminada', description: 'Eliminada de este navegador' });
+      return;
+    }
     try {
       const { error } = await supabase.from('transactions').delete().eq('id', id);
-
       if (error) {
-        console.error('Error deleting transaction:', error);
-        toast({
-          title: "Error",
-          description: "No se pudo eliminar la transacción",
-          variant: "destructive"
-        });
+        toast({ title: 'Error', description: 'No se pudo eliminar la transacción', variant: 'destructive' });
         return;
       }
-
-      // Reload data after successful delete
       await loadData();
-      
-      toast({
-        title: "Transacción eliminada",
-        description: "La transacción fue eliminada de Supabase",
-      });
+      toast({ title: 'Transacción eliminada', description: 'Eliminada correctamente' });
     } catch (error) {
-      console.error('Error deleting transaction:', error);
-      toast({
-        title: "Error",
-        description: "Error al eliminar la transacción",
-        variant: "destructive"
-      });
+      console.error(error);
     }
   };
 
   const clearAllData = async () => {
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "Debes estar autenticado para eliminar datos",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Delete all user's transactions and prices
-      const { error: txError } = await supabase.from('transactions').delete().eq('user_id', user.id);
-      const { error: pricesError } = await supabase.from('current_prices').delete().neq('ticker', 'NONE');
-
-      if (txError || pricesError) {
-        console.error('Error clearing data:', txError || pricesError);
-        toast({
-          title: "Error",
-          description: "No se pudieron limpiar todos los datos",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Clear local state
+    if (isGuest) {
+      localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_PRICES);
       setTransactions([]);
       setCurrentPrices({});
       setPortfolioSummary(null);
-      
-      toast({
-        title: "Datos eliminados",
-        description: "Todos los datos fueron eliminados de Supabase",
-      });
+      toast({ title: 'Datos eliminados', description: 'Se borraron los datos locales del navegador' });
+      return;
+    }
+    try {
+      const { error: txError } = await supabase.from('transactions').delete().eq('user_id', user!.id);
+      const { error: pErr } = await supabase.from('current_prices').delete().neq('ticker', 'NONE');
+      if (txError || pErr) {
+        toast({ title: 'Error', description: 'No se pudieron limpiar todos los datos', variant: 'destructive' });
+        return;
+      }
+      setTransactions([]);
+      setCurrentPrices({});
+      setPortfolioSummary(null);
+      toast({ title: 'Datos eliminados', description: 'Todos los datos fueron eliminados' });
     } catch (error) {
-      console.error('Error clearing data:', error);
-      toast({
-        title: "Error",
-        description: "Error al limpiar los datos",
-        variant: "destructive"
-      });
+      console.error(error);
     }
   };
 
@@ -401,11 +334,11 @@ export const usePortfolioData = () => {
     currentPrices,
     portfolioSummary,
     isLoading,
+    isGuest,
     addTransaction,
     updateCurrentPrice,
     deleteTransaction,
     clearAllData,
-    // CEDEAR prices data
     cedearPrices,
     pricesLoading,
     pricesError,
