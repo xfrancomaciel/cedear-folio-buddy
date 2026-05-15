@@ -31,6 +31,7 @@ const Index = () => {
     updateCurrentPrice,
     deleteTransaction,
     clearAllData,
+    isGuest,
     pricesLoading,
     pricesError,
     pricesLastUpdated,
