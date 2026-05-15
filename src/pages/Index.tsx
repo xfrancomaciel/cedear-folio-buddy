@@ -91,6 +91,11 @@ const Index = () => {
       
       <PullToRefresh onRefresh={handleRefresh} disabled={pricesLoading}>
         <div className={`container mx-auto ${spacing.mobile} ${navigation.bottomSpace}`}>
+        {isGuest && (
+          <div className="mb-4 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            <strong>Modo invitado:</strong> tus transacciones se guardan solo en este navegador. Si limpiás el sitio o cambiás de dispositivo, vas a perderlas. Iniciá sesión para sincronizarlas en la nube.
+          </div>
+        )}
         {/* Price Update Status */}
         <div className="mb-6">
           <PriceUpdateStatus
